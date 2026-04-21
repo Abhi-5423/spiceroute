@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: spiceroute
+    runtime: python3
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB_NAME
+        value: spiceroute
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: SPICEROUTE_SECURE_COOKIES
+        value: 1
