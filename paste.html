@@ -816,9 +816,63 @@
       color: var(--text-main);
     }
 
+    .auth-password-wrap {
+      position: relative;
+    }
+
+    .auth-password-wrap input {
+      padding-right: 54px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+      background: rgba(199, 91, 44, 0.1);
+      color: var(--accent-deep);
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .password-toggle:hover {
+      background: rgba(199, 91, 44, 0.18);
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    .password-toggle svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .password-toggle .eye-off {
+      display: none;
+    }
+
+    .password-toggle.is-visible .eye-on {
+      display: none;
+    }
+
+    .password-toggle.is-visible .eye-off {
+      display: block;
+    }
+
     body.dark .auth-form input,
     body.dark .auth-tab {
       background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    body.dark .password-toggle {
+      background: rgba(255, 255, 255, 0.12);
       color: #fff;
     }
 
@@ -1108,7 +1162,24 @@
         </label>
         <label>
           <span id="authPasswordLabel">Password</span>
-          <input type="password" id="authPassword" placeholder="Create password" required autocomplete="current-password">
+          <div class="auth-password-wrap">
+            <input type="password" id="authPassword" placeholder="Create password" required autocomplete="current-password">
+            <button
+              class="password-toggle"
+              id="passwordToggle"
+              type="button"
+              aria-label="Show password"
+              aria-pressed="false"
+              onclick="toggleAuthPassword()"
+            >
+              <svg class="eye-on" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5C6.5 5 2.1 8.5.5 12c1.6 3.5 6 7 11.5 7s9.9-3.5 11.5-7C21.9 8.5 17.5 5 12 5Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.2A1.8 1.8 0 1 0 12 10a1.8 1.8 0 0 0 0 3.8Z"/>
+              </svg>
+              <svg class="eye-off" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m3.3 2 18.7 18.7-1.4 1.4-3.2-3.2c-1.7.7-3.5 1.1-5.4 1.1-5.5 0-9.9-3.5-11.5-7 1-2.2 3-4.2 5.5-5.5L1.9 3.4 3.3 2Zm5.6 5.6A4 4 0 0 1 16.4 15l-1.6-1.6a1.8 1.8 0 0 0-2.2-2.2L8.9 7.6ZM12 8c-.4 0-.7.1-1 .2l4.8 4.8c.1-.3.2-.6.2-1A4 4 0 0 0 12 8Zm0-3c5.5 0 9.9 3.5 11.5 7-.7 1.5-1.8 3-3.3 4.2l-1.4-1.4a12.6 12.6 0 0 0 2.2-2.8c-1.4-2.4-4.8-5-9-5-1.2 0-2.4.2-3.4.6L7 6.1C8.5 5.4 10.2 5 12 5Z"/>
+              </svg>
+            </button>
+          </div>
         </label>
         <div class="auth-actions">
           <button class="top-btn" type="submit" id="authSubmit">Login</button>
@@ -2809,12 +2880,36 @@
       node.classList.toggle("error", isError);
     }
 
+    function setAuthPasswordVisibility(isVisible) {
+      const passwordInput = document.getElementById("authPassword");
+      const toggleButton = document.getElementById("passwordToggle");
+
+      if (!passwordInput || !toggleButton) {
+        return;
+      }
+
+      passwordInput.type = isVisible ? "text" : "password";
+      toggleButton.classList.toggle("is-visible", isVisible);
+      toggleButton.setAttribute("aria-pressed", String(isVisible));
+      toggleButton.setAttribute("aria-label", isVisible ? "Hide password" : "Show password");
+    }
+
+    function toggleAuthPassword() {
+      const passwordInput = document.getElementById("authPassword");
+      if (!passwordInput) {
+        return;
+      }
+
+      setAuthPasswordVisibility(passwordInput.type === "password");
+    }
+
     function switchAuthMode(mode) {
       authMode = mode;
       document.getElementById("loginTab").classList.toggle("active", mode === "login");
       document.getElementById("signupTab").classList.toggle("active", mode === "signup");
       document.getElementById("authName").parentElement.classList.toggle("hidden", mode === "login");
       document.getElementById("authPassword").setAttribute("autocomplete", mode === "signup" ? "new-password" : "current-password");
+      setAuthPasswordVisibility(false);
       document.getElementById("authSubmit").textContent = mode === "signup"
         ? te("signupButton", "Signup")
         : te("loginButton", "Login");
