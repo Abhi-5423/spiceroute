@@ -1,0 +1,3361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpiceRoute Recipe Studio</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --accent: #c75b2c;
+      --accent-deep: #8f3411;
+      --surface: rgba(255, 251, 247, 0.9);
+      --surface-strong: #fffdf8;
+      --text-main: #2f241f;
+      --muted: #6d5a52;
+      --shadow-soft: 0 18px 40px rgba(120, 61, 29, 0.14);
+      --border-soft: rgba(199, 91, 44, 0.14);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: "Trebuchet MS", "Segoe UI", Verdana, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255, 223, 186, 0.85), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 196, 160, 0.78), transparent 24%),
+        linear-gradient(135deg, #fff6ee, #ffe2d2 42%, #ffd3bd 100%);
+      color: var(--text-main);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    body.dark {
+      background: linear-gradient(135deg, #171311, #231714 48%, #2f1d17 100%);
+      color: #f5f5f5;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.96) translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes softPulse {
+      0%, 100% {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+      }
+      50% {
+        box-shadow: 0 10px 24px rgba(255, 87, 34, 0.28);
+      }
+    }
+
+    @keyframes welcomeGlow {
+      0%, 100% {
+        transform: translateY(0) scale(1);
+        text-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+      }
+      50% {
+        transform: translateY(-4px) scale(1.01);
+        text-shadow: 0 16px 34px rgba(255, 246, 229, 0.35);
+      }
+    }
+
+    .header {
+      padding: 34px 12px 28px;
+      text-align: center;
+      background:
+        linear-gradient(135deg, rgba(113, 39, 15, 0.9), rgba(199, 91, 44, 0.88)),
+        linear-gradient(135deg, #a33e15, #d67237);
+      color: #fff;
+      box-shadow: var(--shadow-soft);
+      animation: fadeSlideUp 0.55s ease both;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-family: Georgia, "Palatino Linotype", "Book Antiqua", serif;
+      font-size: clamp(34px, 5vw, 50px);
+      letter-spacing: 0.5px;
+      text-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .header p {
+      max-width: 760px;
+      margin: 12px auto 0;
+      line-height: 1.65;
+      font-size: 15px;
+      color: rgba(255, 248, 241, 0.92);
+    }
+
+    .controls {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 14px 12px;
+      background: rgba(255, 252, 248, 0.86);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 12px 28px rgba(113, 50, 20, 0.08);
+    }
+
+    body.dark .controls {
+      background: rgba(38, 29, 25, 0.9);
+    }
+
+    .controls input {
+      min-width: 240px;
+      max-width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      font-size: 15px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    }
+
+    body.dark .controls input {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .search-shell {
+      flex: 1 1 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-wrap {
+      position: relative;
+      width: min(760px, 100%);
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon,
+    .search-clear {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      color: var(--accent);
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .search-icon {
+      left: 10px;
+      background: rgba(199, 91, 44, 0.08);
+    }
+
+    .search-clear {
+      right: 8px;
+      border: 0;
+      cursor: pointer;
+      background: transparent;
+      pointer-events: auto;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.18s ease, transform 0.18s ease, background 0.18s ease;
+    }
+
+    .search-clear.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .search-clear:hover {
+      background: rgba(199, 91, 44, 0.12);
+      transform: translateY(-50%) scale(1.06);
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding-left: 58px;
+      padding-right: 52px;
+    }
+
+    .filters-bar {
+      flex: 1 1 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .chip {
+      padding: 9px 12px;
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      background: #fbe4d8;
+      color: var(--accent);
+      font-weight: 700;
+      transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .chip.active,
+    .chip:hover {
+      background: var(--accent);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(199, 91, 44, 0.28);
+    }
+
+    .chip:active,
+    .dark-toggle:active,
+    .view-btn:active,
+    .meal-link:active,
+    .quick-item:active,
+    .back-btn:active {
+      transform: scale(0.97);
+    }
+
+    .extra-filter.is-collapsed {
+      display: none;
+    }
+
+    .more-toggle {
+      background: linear-gradient(135deg, #31231e, #5d453b);
+      color: #fff;
+    }
+
+    .more-toggle:hover,
+    .more-toggle.active {
+      background: linear-gradient(135deg, var(--accent), #e58b4e);
+    }
+
+    .dark-toggle {
+      padding: 11px 14px;
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #2b2f36, #46515b);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      animation: softPulse 3s ease-in-out infinite;
+    }
+
+    .dark-toggle:hover {
+      background: linear-gradient(135deg, var(--accent), #e58b4e);
+      transform: translateY(-2px);
+    }
+
+    .language-picker {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 10px 24px rgba(102, 53, 28, 0.1);
+    }
+
+    body.dark .language-picker {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .language-picker label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    body.dark .language-picker label {
+      color: #f0ddd1;
+    }
+
+    .language-picker select {
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font: inherit;
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    body.dark .language-picker select {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .meal-lists {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(220px, 1fr));
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .meal-panel {
+      overflow: hidden;
+      border-radius: 20px;
+      background: var(--surface-strong);
+      box-shadow: var(--shadow-soft);
+      animation: fadeSlideUp 0.55s ease both;
+    }
+
+    .meal-panel:nth-child(2) {
+      animation-delay: 0.08s;
+    }
+
+    .meal-panel:nth-child(3) {
+      animation-delay: 0.16s;
+    }
+
+    body.dark .meal-panel {
+      background: #1e1e1e;
+    }
+
+    .meal-panel h2 {
+      margin: 0;
+      padding: 14px;
+      color: #fff;
+      font-size: 20px;
+    }
+
+    .meal-panel.breakfast h2 {
+      background: #fff3e0;
+      color: #6d4c41;
+    }
+
+    .meal-panel.lunch h2 {
+      background: #e8f5e9;
+      color: #1b5e20;
+    }
+
+    .meal-panel.dinner h2 {
+      background: #e3f2fd;
+      color: #0d47a1;
+    }
+
+    .meal-list {
+      display: grid;
+      max-height: 310px;
+      overflow-y: auto;
+      padding: 12px;
+      gap: 9px;
+    }
+
+    .meal-link {
+      padding: 10px 12px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #263238;
+      font-weight: 700;
+      text-align: left;
+      background: #f7f7f7;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .meal-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .meal-link.breakfast {
+      border-color: #ffe0b2;
+      background: #fff8e1;
+    }
+
+    .meal-link.lunch {
+      border-color: #c8e6c9;
+      background: #f1f8e9;
+    }
+
+    .meal-link.dinner {
+      border-color: #bbdefb;
+      background: #eaf4ff;
+    }
+
+    .stats {
+      padding: 12px 18px 0;
+      font-weight: 700;
+      text-align: center;
+      scroll-margin-top: 76px;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .stats.pulse {
+      color: #ff5722;
+      transform: scale(1.03);
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      padding: 18px;
+      align-items: start;
+    }
+
+    .recipe {
+      align-self: start;
+      overflow: hidden;
+      border-radius: 18px;
+      background: var(--surface-strong);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+      animation: fadeSlideUp 0.45s ease both;
+    }
+
+    .recipe:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    .recipe.search-top-match {
+      border-color: rgba(199, 91, 44, 0.42);
+      box-shadow: 0 18px 36px rgba(199, 91, 44, 0.22);
+    }
+
+    body.dark .recipe {
+      background: #1e1e1e;
+    }
+
+    .img-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: linear-gradient(135deg, #fff3e0, #e3f2fd);
+    }
+
+    .img-box img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.35s ease;
+    }
+
+    .recipe:hover img {
+      transform: scale(1.06);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0));
+      color: #fff;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .recipe:hover .overlay {
+      opacity: 1;
+    }
+
+    .view-btn {
+      padding: 6px 10px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #ff5722;
+      color: #fff;
+      font-weight: 700;
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .view-btn:hover {
+      background: #e64a19;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+    }
+
+    .content {
+      padding: 12px 14px 16px;
+    }
+
+    .title {
+      margin-bottom: 6px;
+      color: var(--accent-deep);
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .summary {
+      margin: 0 0 10px;
+      color: #555;
+      line-height: 1.4;
+    }
+
+    body.dark .summary {
+      color: #d4d4d4;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #f1f1f1;
+      color: #333;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    body.detail-open .dark-toggle,
+    body.detail-open #topTools,
+    body.detail-open .controls,
+    body.detail-open #quickCorner,
+    body.detail-open #mealLists,
+    body.detail-open #stats,
+    body.detail-open #recipes {
+      display: none !important;
+    }
+
+    .detail-page {
+      display: none;
+      padding: 18px;
+    }
+
+    .detail-page.active {
+      display: block;
+      animation: fadeSlideUp 0.42s ease both;
+    }
+
+    .back-btn {
+      margin-bottom: 14px;
+      padding: 10px 14px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #263238;
+      color: #fff;
+      font-weight: 700;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background: #ff5722;
+      transform: translateY(-2px);
+    }
+
+    .detail-hero {
+      display: grid;
+      grid-template-columns: minmax(260px, 420px) 1fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 18px;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+      animation: fadeSlideUp 0.45s ease both;
+    }
+
+    body.dark .detail-hero,
+    body.dark .detail-card {
+      background: #1e1e1e;
+    }
+
+    .detail-hero img {
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      object-fit: cover;
+    }
+
+    .detail-intro {
+      padding: 18px;
+    }
+
+    .detail-intro h2 {
+      margin: 0 0 8px;
+      color: #ff5722;
+      font-size: 30px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+
+    .detail-card {
+      padding: 16px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+      animation: fadeSlideUp 0.45s ease both;
+    }
+
+    .detail-card:nth-child(2) {
+      animation-delay: 0.08s;
+    }
+
+    .detail-card:nth-child(3) {
+      animation-delay: 0.16s;
+    }
+
+    .detail-card h3 {
+      margin: 0 0 10px;
+      color: #ff5722;
+    }
+
+    .detail-card ul,
+    .detail-card ol {
+      margin: 0;
+      padding-left: 22px;
+      line-height: 1.55;
+    }
+
+    .detail-card li {
+      margin-bottom: 6px;
+    }
+
+    .welcome-overlay,
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(34, 20, 14, 0.6);
+      backdrop-filter: blur(14px);
+    }
+
+    .welcome-card,
+    .auth-card {
+      width: min(100%, 540px);
+      border-radius: 28px;
+      padding: 28px;
+      background:
+        radial-gradient(circle at top right, rgba(255, 223, 186, 0.76), transparent 34%),
+        linear-gradient(145deg, rgba(255, 252, 248, 0.98), rgba(255, 240, 229, 0.96));
+      color: var(--text-main);
+      box-shadow: 0 26px 60px rgba(31, 16, 11, 0.26);
+      animation: popIn 0.36s ease both;
+    }
+
+    body.dark .welcome-card,
+    body.dark .auth-card {
+      background:
+        radial-gradient(circle at top right, rgba(255, 152, 91, 0.15), transparent 34%),
+        linear-gradient(145deg, rgba(35, 25, 21, 0.98), rgba(26, 20, 17, 0.98));
+      color: #f7ede7;
+    }
+
+    .welcome-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(199, 91, 44, 0.12);
+      color: var(--accent-deep);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    .welcome-card h2 {
+      margin: 16px 0 10px;
+      font-size: clamp(30px, 6vw, 48px);
+      line-height: 1.05;
+      animation: welcomeGlow 2.6s ease-in-out infinite;
+    }
+
+    .welcome-card p,
+    .auth-card p {
+      margin: 0 0 18px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    body.dark .welcome-card p,
+    body.dark .auth-card p {
+      color: #dfcfc6;
+    }
+
+    .top-btn {
+      padding: 11px 16px;
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), #e58b4e);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 12px 28px rgba(199, 91, 44, 0.24);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    }
+
+    .top-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px rgba(199, 91, 44, 0.28);
+      filter: saturate(1.05);
+    }
+
+    .auth-close {
+      background: linear-gradient(135deg, #66534a, #8e776d);
+      box-shadow: 0 12px 28px rgba(70, 49, 39, 0.18);
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .auth-tab {
+      flex: 1 1 0;
+      padding: 11px 14px;
+      border: 1px solid rgba(199, 91, 44, 0.14);
+      border-radius: 999px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--accent-deep);
+      font-weight: 700;
+      transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .auth-tab.active {
+      background: linear-gradient(135deg, var(--accent), #e58b4e);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(199, 91, 44, 0.24);
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .auth-form label {
+      display: grid;
+      gap: 7px;
+      font-weight: 700;
+    }
+
+    .auth-form span {
+      font-size: 14px;
+    }
+
+    .auth-form input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(199, 91, 44, 0.14);
+      border-radius: 14px;
+      font: inherit;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text-main);
+    }
+
+    body.dark .auth-form input,
+    body.dark .auth-tab {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .auth-actions,
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .auth-message {
+      min-height: 24px;
+      margin-top: 14px;
+      font-weight: 700;
+      color: #1b5e20;
+    }
+
+    .auth-message.error {
+      color: #b3261e;
+    }
+
+    .auth-status {
+      display: grid;
+      gap: 4px;
+      padding: 12px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 10px 24px rgba(102, 53, 28, 0.08);
+    }
+
+    .auth-status span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    body.dark .auth-status {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .quick-corner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+      width: 100%;
+    }
+
+    .quick-box {
+      position: relative;
+      border-radius: 16px;
+      background: var(--surface-strong);
+      box-shadow: 0 12px 30px rgba(68, 36, 22, 0.2);
+      min-width: 210px;
+      overflow: visible;
+    }
+
+    body.dark .quick-box {
+      background: #1e1e1e;
+    }
+
+    .quick-box summary {
+      padding: 11px 13px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), #e58b4e);
+      color: #fff;
+      font-weight: 700;
+      list-style: none;
+    }
+
+    .quick-box summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .quick-list {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 60;
+      display: grid;
+      width: min(320px, calc(100vw - 28px));
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 10px;
+      gap: 8px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+      transform-origin: top right;
+      animation: popIn 0.18s ease both;
+    }
+
+    body.dark .quick-list {
+      background: #1e1e1e;
+    }
+
+    .quick-item {
+      padding: 9px 10px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ffe0d6, #e1f5fe);
+      color: #4e342e;
+      font-weight: 700;
+      text-align: left;
+      transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+    }
+
+    .quick-item:hover {
+      background: #ff5722;
+      color: #fff;
+      transform: translateX(-3px);
+    }
+
+    .collection-card {
+      padding: 14px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+      animation: fadeSlideUp 0.4s ease both;
+    }
+
+    body.dark .collection-card {
+      background: #1e1e1e;
+    }
+
+    .collection-card h3 {
+      margin: 0 0 6px;
+      color: #ff5722;
+    }
+
+    .collection-card p {
+      margin: 0 0 10px;
+      color: #555;
+      line-height: 1.45;
+    }
+
+    body.dark .collection-card p {
+      color: #d4d4d4;
+    }
+
+    .top-tools {
+      position: relative;
+      z-index: 35;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 14px 18px;
+      background: rgba(255, 249, 244, 0.78);
+      backdrop-filter: blur(8px);
+      animation: fadeSlideUp 0.5s ease both;
+    }
+
+    .reveal-ready {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .reveal-ready.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    body.dark .top-tools {
+      background: rgba(18, 18, 18, 0.72);
+    }
+
+    @media (max-width: 760px) {
+      .header {
+        padding: 26px 14px 22px;
+      }
+
+      .top-tools,
+      .controls,
+      .filters-bar,
+      .toolbar-group,
+      .auth-actions {
+        justify-content: stretch;
+      }
+
+      .top-btn,
+      .dark-toggle,
+      .language-picker,
+      .auth-tab {
+        width: 100%;
+        padding: 9px 11px;
+        font-size: 13px;
+      }
+
+      .auth-status,
+      .search-shell,
+      .search-wrap,
+      .filters-bar {
+        width: 100%;
+      }
+
+      .chip {
+        flex: 1 1 calc(50% - 8px);
+        text-align: center;
+      }
+
+      .more-toggle {
+        flex-basis: 100%;
+      }
+
+      .quick-corner {
+        justify-content: stretch;
+      }
+
+      .quick-box {
+        width: 100%;
+      }
+
+      .top-tools {
+        justify-content: stretch;
+      }
+
+      .meal-lists {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-hero {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-hero img {
+        min-height: 220px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .controls,
+      .top-tools,
+      .detail-page,
+      .meal-lists,
+      .container {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .welcome-card,
+      .auth-card {
+        padding: 22px 18px;
+        border-radius: 22px;
+      }
+
+      .chip {
+        flex-basis: 100%;
+      }
+
+      .title {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="welcome-overlay" id="welcomeOverlay">
+    <div class="welcome-card">
+      <div class="welcome-badge">Welcome</div>
+      <h2 id="welcomeTitle">SpiceRoute Recipe Studio</h2>
+      <p id="welcomeText">Fresh flavors, smart search, and easy recipe browsing for every screen.</p>
+      <button class="top-btn" id="welcomeButton" onclick="hideWelcomeOverlay()">Enter SpiceRoute</button>
+    </div>
+  </div>
+
+  <div class="auth-modal hidden" id="authModal">
+    <div class="auth-card">
+      <h2 id="authHeading">Join SpiceRoute</h2>
+      <p id="authIntro">Create an account or log in to keep your session ready on this device.</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="loginTab" type="button" onclick="switchAuthMode('login')">Login</button>
+        <button class="auth-tab" id="signupTab" type="button" onclick="switchAuthMode('signup')">Signup</button>
+      </div>
+      <form class="auth-form" id="authForm" onsubmit="submitAuth(event)">
+        <label>
+          <span id="authNameLabel">Full Name</span>
+          <input type="text" id="authName" placeholder="Enter your name" autocomplete="name">
+        </label>
+        <label>
+          <span id="authEmailLabel">Email</span>
+          <input type="email" id="authEmail" placeholder="Enter your email" required autocomplete="email">
+        </label>
+        <label>
+          <span id="authPasswordLabel">Password</span>
+          <input type="password" id="authPassword" placeholder="Create password" required autocomplete="current-password">
+        </label>
+        <div class="auth-actions">
+          <button class="top-btn" type="submit" id="authSubmit">Login</button>
+          <button class="top-btn auth-close" type="button" id="authCloseButton" onclick="closeAuthModal()">Close</button>
+        </div>
+      </form>
+      <div class="auth-message" id="authMessage" aria-live="polite"></div>
+    </div>
+  </div>
+  <header class="header">
+    <h1 id="siteTitle">SpiceRoute Recipe Studio</h1>
+    <p id="siteIntro">Beautiful recipe cards with images, ingredients, spices, and step-by-step cooking help. Switch the site language anytime to make browsing easier for more users.</p>
+  </header>
+
+  <div class="top-tools" id="topTools">
+    <div class="auth-status">
+      <strong id="userGreeting">Guest User</strong>
+      <span id="userStatus">Login to save your session on this device.</span>
+    </div>
+
+    <div class="toolbar-group">
+      <button class="top-btn" id="authOpenButton" type="button" onclick="openAuthModal()">Login / Signup</button>
+      <button class="top-btn hidden" id="logoutButton" type="button" onclick="logoutUser()">Logout</button>
+      <button class="dark-toggle" id="darkToggle" type="button" onclick="toggleDark()">Dark Mode</button>
+
+      <div class="language-picker">
+      <label for="languageSelect" id="languageLabel">Language</label>
+      <select id="languageSelect" onchange="changeLanguage()">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+        <option value="gu">ગુજરાતી</option>
+        <option value="mr">मराठी</option>
+        <option value="te">తెలుగు</option>
+        <option value="bn">বাংলা</option>
+        <option value="bho">भोजपुरी</option>
+      </select>
+      </div>
+    </div>
+
+    <aside class="quick-corner" id="quickCorner">
+      <details class="quick-box">
+        <summary id="stateSummary">Indian States</summary>
+        <div class="quick-list" id="stateList"></div>
+      </details>
+
+      <details class="quick-box">
+        <summary id="countrySummary">Countries</summary>
+        <div class="quick-list" id="countryList"></div>
+      </details>
+    </aside>
+  </div>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search recipes, countries, ingredients..." onkeyup="searchRecipe()">
+    <button class="chip active" id="filter-all" onclick="setFilter(this, 'all')">All 🍽️</button>
+    <button class="chip" id="filter-veg" onclick="setFilter(this, 'veg')">Veg 🥦</button>
+    <button class="chip" id="filter-nonveg" onclick="setFilter(this, 'nonveg')">Non-Veg 🍖</button>
+    <button class="chip" id="filter-chicken" onclick="setFilter(this, 'chicken')">Chicken 🍗</button>
+    <button class="chip" id="filter-mutton" onclick="setFilter(this, 'mutton')">Mutton 🍖</button>
+    <button class="chip" id="filter-fastfood" onclick="setFilter(this, 'fastfood')">Fast Food 🍔</button>
+    <button class="chip" id="filter-junkfood" onclick="setFilter(this, 'junkfood')">Junk Food 🍟</button>
+    <button class="chip" id="filter-colddrink" onclick="setFilter(this, 'colddrink')">Cold Drinks 🥤</button>
+    <button class="chip" id="filter-breakfast" onclick="setFilter(this, 'breakfast')">Breakfast 🍳</button>
+    <button class="chip" id="filter-lunch" onclick="setFilter(this, 'lunch')">Lunch 🍛</button>
+    <button class="chip" id="filter-dinner" onclick="setFilter(this, 'dinner')">Dinner 🍽️</button>
+    <button class="chip" id="filter-dessert" onclick="setFilter(this, 'dessert')">Dessert 🍰</button>
+    <button class="chip" id="filter-snack" onclick="setFilter(this, 'snack')">Snack 🌮</button>
+  </div>
+
+  <section class="meal-lists" id="mealLists">
+    <article class="meal-panel breakfast">
+      <h2 id="breakfastHeading">1. Breakfast Recipes</h2>
+      <div class="meal-list" id="breakfastList"></div>
+    </article>
+
+    <article class="meal-panel lunch">
+      <h2 id="lunchHeading">2. Lunch Recipes</h2>
+      <div class="meal-list" id="lunchList"></div>
+    </article>
+
+    <article class="meal-panel dinner">
+      <h2 id="dinnerHeading">3. Dinner Recipes</h2>
+      <div class="meal-list" id="dinnerList"></div>
+    </article>
+  </section>
+
+  <div class="stats" id="stats"></div>
+  <main class="container" id="recipes"></main>
+  <section class="detail-page" id="detailPage"></section>
+
+  <script>
+    const recipes = [
+      {
+        name: "Paneer Butter Masala",
+        country: "India",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?paneer,butter,masala",
+        summary: "Creamy tomato-based paneer curry.",
+        ingredients: ["Paneer", "Tomatoes", "Onion", "Butter", "Cream", "Ginger-garlic paste"],
+        spices: ["Red chilli powder", "Turmeric", "Garam masala", "Kasuri methi", "Salt"],
+        steps: ["Heat butter in a pan.", "Cook onion until soft.", "Add ginger-garlic paste and tomatoes.", "Cook until tomatoes become thick.", "Add spices and a little water.", "Add paneer cubes and simmer.", "Add cream and kasuri methi.", "Serve hot with roti or rice."]
+      },
+      {
+        name: "Dal Tadka",
+        country: "India",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?dal,tadka",
+        summary: "Yellow lentils finished with hot spiced tempering.",
+        ingredients: ["Toor dal or moong dal", "Water", "Onion", "Tomato", "Garlic", "Ghee"],
+        spices: ["Cumin", "Mustard seeds", "Turmeric", "Red chilli powder", "Asafoetida", "Salt"],
+        steps: ["Wash dal well.", "Boil dal with turmeric and salt until soft.", "Mash lightly.", "Heat ghee in a small pan.", "Add cumin, mustard seeds, garlic, onion, and tomato.", "Add chilli powder.", "Pour tadka over dal.", "Simmer for 2 minutes and serve."]
+      },
+      {
+        name: "Masala Dosa",
+        country: "India",
+        type: "veg",
+        meal: "breakfast",
+        image: "https://source.unsplash.com/800x600/?masala,dosa",
+        summary: "Crisp rice-lentil crepe with potato filling.",
+        ingredients: ["Dosa batter", "Potatoes", "Onion", "Green chilli", "Oil", "Curry leaves"],
+        spices: ["Mustard seeds", "Turmeric", "Cumin", "Salt"],
+        steps: ["Boil and mash potatoes.", "Heat oil and add mustard seeds.", "Add onion, chilli, curry leaves, and turmeric.", "Mix in mashed potatoes and salt.", "Spread dosa batter on a hot tawa.", "Drizzle oil and cook until crisp.", "Place potato masala inside.", "Fold and serve with chutney."]
+      },
+      {
+        name: "Chicken Biryani",
+        country: "India",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?chicken,biryani",
+        summary: "Layered rice and chicken cooked with aromatic spices.",
+        ingredients: ["Chicken", "Basmati rice", "Onion", "Curd", "Mint", "Coriander", "Ghee"],
+        spices: ["Biryani masala", "Cardamom", "Cloves", "Cinnamon", "Bay leaf", "Chilli powder", "Salt"],
+        steps: ["Marinate chicken with curd and spices.", "Soak rice for 20 minutes.", "Fry onions until golden.", "Cook chicken until nearly done.", "Boil rice until 70 percent cooked.", "Layer rice, chicken, fried onion, mint, and ghee.", "Cover tightly and cook on low heat.", "Rest for 10 minutes before serving."]
+      },
+      {
+        name: "Poha",
+        country: "India",
+        type: "veg",
+        meal: "breakfast",
+        image: "https://source.unsplash.com/800x600/?poha",
+        summary: "Flattened rice breakfast with peanuts and spices.",
+        ingredients: ["Poha", "Onion", "Peanuts", "Green chilli", "Lemon juice", "Oil"],
+        spices: ["Mustard seeds", "Turmeric", "Curry leaves", "Salt", "Sugar"],
+        steps: ["Rinse poha lightly and drain.", "Heat oil in a pan.", "Fry peanuts and remove if desired.", "Add mustard seeds, curry leaves, chilli, and onion.", "Add turmeric, salt, and sugar.", "Add poha and mix gently.", "Cook for 2 minutes.", "Finish with lemon juice."]
+      },
+      {
+        name: "Veg Fried Rice",
+        country: "China",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?vegetable,fried,rice",
+        summary: "Fast wok-style rice with vegetables and soy sauce.",
+        ingredients: ["Cooked rice", "Carrot", "Beans", "Capsicum", "Spring onion", "Garlic", "Oil"],
+        spices: ["Black pepper", "Soy sauce", "Vinegar", "Salt"],
+        steps: ["Use cold cooked rice for best texture.", "Heat oil on high flame.", "Add garlic and chopped vegetables.", "Stir fry quickly.", "Add rice.", "Add soy sauce, vinegar, pepper, and salt.", "Toss until hot.", "Garnish with spring onion."]
+      },
+      {
+        name: "Chicken Curry",
+        country: "India",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?chicken,curry",
+        summary: "Homestyle chicken cooked in onion-tomato gravy.",
+        ingredients: ["Chicken", "Onion", "Tomato", "Ginger-garlic paste", "Oil", "Water"],
+        spices: ["Turmeric", "Chilli powder", "Coriander powder", "Garam masala", "Salt"],
+        steps: ["Heat oil in a pan.", "Cook onions until golden.", "Add ginger-garlic paste.", "Add tomatoes and cook until soft.", "Add spices.", "Add chicken and sear.", "Add water and cover.", "Simmer until chicken is cooked."]
+      },
+      {
+        name: "Mutton Curry",
+        country: "India",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?mutton,curry",
+        summary: "Rich slow-cooked mutton curry.",
+        ingredients: ["Mutton", "Onion", "Tomato", "Curd", "Ginger-garlic paste", "Oil"],
+        spices: ["Turmeric", "Chilli powder", "Coriander powder", "Garam masala", "Bay leaf", "Salt"],
+        steps: ["Marinate mutton with curd and spices.", "Heat oil and cook onions.", "Add ginger-garlic paste.", "Add tomato and cook into masala.", "Add mutton and sear well.", "Add water.", "Pressure cook or simmer until tender.", "Reduce gravy and serve."]
+      },
+      {
+        name: "Fish Fry",
+        country: "India",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?fish,fry",
+        summary: "Spiced marinated fish shallow fried until crisp.",
+        ingredients: ["Fish slices", "Lemon juice", "Rice flour", "Ginger-garlic paste", "Oil"],
+        spices: ["Turmeric", "Chilli powder", "Coriander powder", "Black pepper", "Salt"],
+        steps: ["Clean and pat fish dry.", "Mix lemon juice, paste, spices, and salt.", "Apply marinade to fish.", "Rest for 15 minutes.", "Dust with rice flour.", "Heat oil.", "Shallow fry both sides.", "Serve hot with lemon."]
+      },
+      {
+        name: "Pizza Margherita",
+        country: "Italy",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?margherita,pizza",
+        summary: "Classic pizza with tomato, mozzarella, and basil.",
+        ingredients: ["Pizza dough", "Tomato sauce", "Mozzarella", "Fresh basil", "Olive oil"],
+        spices: ["Salt", "Black pepper", "Oregano"],
+        steps: ["Preheat oven very hot.", "Stretch pizza dough.", "Spread tomato sauce.", "Add mozzarella.", "Sprinkle salt, pepper, and oregano.", "Bake until crust is crisp.", "Add basil and olive oil.", "Slice and serve."]
+      },
+      {
+        name: "Pasta Carbonara",
+        country: "Italy",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?pasta,carbonara",
+        summary: "Creamy egg-cheese pasta with cured meat.",
+        ingredients: ["Spaghetti", "Eggs", "Parmesan or pecorino", "Pancetta or bacon", "Pasta water"],
+        spices: ["Black pepper", "Salt"],
+        steps: ["Boil pasta in salted water.", "Cook pancetta until crisp.", "Whisk eggs with grated cheese and pepper.", "Reserve pasta water.", "Toss hot pasta with pancetta.", "Remove from heat.", "Mix in egg-cheese sauce.", "Loosen with pasta water and serve."]
+      },
+      {
+        name: "Sushi Rolls",
+        country: "Japan",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?sushi,rolls",
+        summary: "Rice and fillings rolled in nori.",
+        ingredients: ["Sushi rice", "Nori sheets", "Fish or cucumber", "Avocado", "Rice vinegar", "Soy sauce"],
+        spices: ["Salt", "Sugar", "Wasabi", "Pickled ginger"],
+        steps: ["Cook sushi rice.", "Season rice with vinegar, salt, and sugar.", "Place nori on a mat.", "Spread rice thinly.", "Add fish or vegetable filling.", "Roll tightly.", "Slice with a wet knife.", "Serve with soy sauce and wasabi."]
+      },
+      {
+        name: "Ramen",
+        country: "Japan",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?ramen,noodles",
+        summary: "Noodles in savory broth with toppings.",
+        ingredients: ["Ramen noodles", "Chicken or vegetable broth", "Egg", "Spring onion", "Mushrooms", "Soy sauce"],
+        spices: ["Ginger", "Garlic", "Chilli oil", "Salt", "White pepper"],
+        steps: ["Prepare broth with ginger and garlic.", "Boil noodles separately.", "Soft boil an egg.", "Season broth with soy sauce and pepper.", "Place noodles in a bowl.", "Pour hot broth over noodles.", "Add egg, mushrooms, and spring onion.", "Finish with chilli oil."]
+      },
+      {
+        name: "Pad Thai",
+        country: "Thailand",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?pad,thai",
+        summary: "Rice noodles stir fried with tangy sauce.",
+        ingredients: ["Rice noodles", "Shrimp or tofu", "Egg", "Bean sprouts", "Peanuts", "Tamarind paste"],
+        spices: ["Fish sauce or soy sauce", "Palm sugar", "Chilli flakes", "Lime"],
+        steps: ["Soak rice noodles.", "Mix tamarind, sauce, sugar, and chilli.", "Stir fry shrimp or tofu.", "Add egg and scramble.", "Add noodles and sauce.", "Toss until coated.", "Add sprouts and peanuts.", "Serve with lime."]
+      },
+      {
+        name: "Thai Green Curry",
+        country: "Thailand",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?thai,green,curry",
+        summary: "Coconut curry with green curry paste.",
+        ingredients: ["Chicken or tofu", "Coconut milk", "Green curry paste", "Vegetables", "Basil", "Oil"],
+        spices: ["Fish sauce or soy sauce", "Sugar", "Green chilli", "Lime leaves"],
+        steps: ["Heat oil in a pot.", "Fry green curry paste.", "Add coconut milk.", "Add chicken or tofu.", "Simmer until cooked.", "Add vegetables.", "Season with sauce and sugar.", "Finish with basil."]
+      },
+      {
+        name: "Tacos",
+        country: "Mexico",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?tacos",
+        summary: "Tortillas filled with seasoned meat and toppings.",
+        ingredients: ["Tortillas", "Minced meat or beans", "Onion", "Tomato", "Lettuce", "Cheese", "Lime"],
+        spices: ["Cumin", "Paprika", "Chilli powder", "Garlic powder", "Salt"],
+        steps: ["Cook meat or beans in a pan.", "Add spices and a little water.", "Warm tortillas.", "Chop toppings.", "Fill tortillas with meat or beans.", "Add vegetables and cheese.", "Squeeze lime on top.", "Serve immediately."]
+      },
+      {
+        name: "Guacamole",
+        country: "Mexico",
+        type: "veg",
+        meal: "snack",
+        image: "https://source.unsplash.com/800x600/?guacamole",
+        summary: "Fresh avocado dip with lime and herbs.",
+        ingredients: ["Avocados", "Onion", "Tomato", "Coriander", "Lime juice"],
+        spices: ["Salt", "Black pepper", "Green chilli", "Cumin"],
+        steps: ["Cut and scoop avocados.", "Mash roughly.", "Add onion, tomato, coriander, and chilli.", "Add lime juice.", "Season with salt, pepper, and cumin.", "Mix gently.", "Taste and adjust lime.", "Serve with chips or toast."]
+      },
+      {
+        name: "Paella",
+        country: "Spain",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?paella",
+        summary: "Spanish rice dish with saffron and seafood or chicken.",
+        ingredients: ["Short grain rice", "Chicken or seafood", "Tomato", "Bell pepper", "Stock", "Olive oil"],
+        spices: ["Saffron", "Paprika", "Garlic", "Salt", "Black pepper"],
+        steps: ["Heat olive oil in a wide pan.", "Sear chicken or seafood.", "Add garlic, tomato, and bell pepper.", "Add rice and stir.", "Add stock, saffron, paprika, salt, and pepper.", "Simmer without stirring.", "Cook until rice absorbs liquid.", "Rest for 5 minutes."]
+      },
+      {
+        name: "Falafel",
+        country: "Middle East",
+        type: "veg",
+        meal: "snack",
+        image: "https://source.unsplash.com/800x600/?falafel",
+        summary: "Crisp chickpea fritters with herbs.",
+        ingredients: ["Soaked chickpeas", "Onion", "Garlic", "Parsley", "Coriander", "Flour", "Oil"],
+        spices: ["Cumin", "Coriander powder", "Black pepper", "Salt", "Chilli powder"],
+        steps: ["Soak chickpeas overnight.", "Blend chickpeas with herbs, onion, and garlic.", "Add spices and flour.", "Rest mixture for 20 minutes.", "Shape small balls.", "Heat oil.", "Fry until golden.", "Serve with tahini or pita."]
+      },
+      {
+        name: "Hummus",
+        country: "Middle East",
+        type: "veg",
+        meal: "snack",
+        image: "https://source.unsplash.com/800x600/?hummus",
+        summary: "Creamy chickpea and tahini dip.",
+        ingredients: ["Cooked chickpeas", "Tahini", "Lemon juice", "Garlic", "Olive oil", "Water"],
+        spices: ["Cumin", "Paprika", "Salt"],
+        steps: ["Add chickpeas to a blender.", "Add tahini, lemon juice, garlic, cumin, and salt.", "Blend until smooth.", "Add water slowly for texture.", "Spoon into a bowl.", "Drizzle olive oil.", "Sprinkle paprika.", "Serve with bread or vegetables."]
+      },
+      {
+        name: "Greek Salad",
+        country: "Greece",
+        type: "veg",
+        meal: "snack",
+        image: "https://source.unsplash.com/800x600/?greek,salad",
+        summary: "Fresh salad with feta, olives, and vegetables.",
+        ingredients: ["Cucumber", "Tomato", "Onion", "Feta cheese", "Olives", "Olive oil"],
+        spices: ["Oregano", "Salt", "Black pepper", "Lemon juice"],
+        steps: ["Chop cucumber, tomato, and onion.", "Add vegetables to a bowl.", "Add olives and feta.", "Drizzle olive oil.", "Add lemon juice.", "Season with oregano, salt, and pepper.", "Toss gently.", "Serve fresh."]
+      },
+      {
+        name: "Beef Burger",
+        country: "United States",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?beef,burger",
+        summary: "Juicy burger patty with bun and toppings.",
+        ingredients: ["Burger buns", "Minced beef", "Cheese", "Lettuce", "Tomato", "Onion", "Sauce"],
+        spices: ["Salt", "Black pepper", "Garlic powder", "Paprika"],
+        steps: ["Season minced beef.", "Shape into patties.", "Heat pan or grill.", "Cook patties on both sides.", "Add cheese near the end.", "Toast buns.", "Assemble with vegetables and sauce.", "Serve hot."]
+      },
+      {
+        name: "Pancakes",
+        country: "United States",
+        type: "veg",
+        meal: "breakfast",
+        image: "https://source.unsplash.com/800x600/?pancakes",
+        summary: "Soft breakfast pancakes.",
+        ingredients: ["Flour", "Milk", "Egg", "Sugar", "Baking powder", "Butter"],
+        spices: ["Salt", "Vanilla", "Cinnamon"],
+        steps: ["Mix flour, sugar, baking powder, salt, and cinnamon.", "Whisk milk, egg, vanilla, and melted butter.", "Combine wet and dry ingredients.", "Heat a pan.", "Pour batter.", "Cook until bubbles appear.", "Flip and cook the other side.", "Serve with syrup or fruit."]
+      },
+      {
+        name: "French Omelette",
+        country: "France",
+        type: "nonveg",
+        meal: "breakfast",
+        image: "https://source.unsplash.com/800x600/?french,omelette",
+        summary: "Soft folded eggs cooked gently with butter.",
+        ingredients: ["Eggs", "Butter", "Cheese or herbs"],
+        spices: ["Salt", "White pepper", "Chives"],
+        steps: ["Beat eggs with salt and pepper.", "Melt butter on low heat.", "Add eggs.", "Stir gently while shaking pan.", "Stop while eggs are still soft.", "Add cheese or herbs.", "Fold omelette.", "Serve immediately."]
+      },
+      {
+        name: "Ratatouille",
+        country: "France",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?ratatouille",
+        summary: "Vegetable stew with herbs and olive oil.",
+        ingredients: ["Eggplant", "Zucchini", "Tomato", "Bell pepper", "Onion", "Olive oil"],
+        spices: ["Garlic", "Thyme", "Basil", "Salt", "Black pepper"],
+        steps: ["Chop vegetables.", "Heat olive oil.", "Cook onion and garlic.", "Add eggplant and bell pepper.", "Add zucchini and tomato.", "Season with herbs, salt, and pepper.", "Simmer until tender.", "Serve warm."]
+      },
+      {
+        name: "Shakshuka",
+        country: "North Africa",
+        type: "nonveg",
+        meal: "breakfast",
+        image: "https://source.unsplash.com/800x600/?shakshuka",
+        summary: "Eggs poached in spiced tomato sauce.",
+        ingredients: ["Eggs", "Tomatoes", "Onion", "Bell pepper", "Garlic", "Olive oil"],
+        spices: ["Cumin", "Paprika", "Chilli powder", "Salt", "Black pepper"],
+        steps: ["Heat olive oil.", "Cook onion and bell pepper.", "Add garlic.", "Add tomatoes and spices.", "Simmer until thick.", "Make small wells in sauce.", "Crack eggs into wells.", "Cover and cook until eggs set."]
+      },
+      {
+        name: "Jollof Rice",
+        country: "West Africa",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?jollof,rice",
+        summary: "Tomato-spiced one-pot rice.",
+        ingredients: ["Rice", "Tomato puree", "Onion", "Bell pepper", "Stock", "Chicken or vegetables", "Oil"],
+        spices: ["Thyme", "Curry powder", "Bay leaf", "Chilli powder", "Salt"],
+        steps: ["Blend tomato, onion, and pepper.", "Cook sauce in oil until reduced.", "Add spices and stock.", "Add washed rice.", "Cover and cook on low heat.", "Stir gently when nearly done.", "Add cooked chicken or vegetables.", "Rest before serving."]
+      },
+      {
+        name: "Chocolate Cake",
+        country: "Global",
+        type: "veg",
+        meal: "dessert",
+        image: "https://source.unsplash.com/800x600/?chocolate,cake",
+        summary: "Moist cocoa cake for dessert.",
+        ingredients: ["Flour", "Cocoa powder", "Sugar", "Milk", "Oil", "Baking powder", "Yogurt"],
+        spices: ["Salt", "Vanilla"],
+        steps: ["Preheat oven.", "Mix flour, cocoa, sugar, baking powder, and salt.", "Add milk, oil, yogurt, and vanilla.", "Whisk into smooth batter.", "Pour into greased tin.", "Bake until a toothpick comes out clean.", "Cool completely.", "Frost or serve plain."]
+      },
+      {
+        name: "Gulab Jamun",
+        country: "India",
+        type: "veg",
+        meal: "dessert",
+        image: "https://source.unsplash.com/800x600/?gulab,jamun",
+        summary: "Soft milk dumplings soaked in sugar syrup.",
+        ingredients: ["Milk powder", "Flour", "Ghee", "Milk", "Sugar", "Water", "Oil"],
+        spices: ["Cardamom", "Rose water", "Saffron"],
+        steps: ["Make syrup with sugar, water, cardamom, and rose water.", "Mix milk powder, flour, ghee, and milk.", "Knead gently into soft dough.", "Shape small balls.", "Heat oil on low-medium heat.", "Fry balls until brown.", "Soak in warm syrup.", "Rest before serving."]
+      },
+      {
+        name: "Apple Pie",
+        country: "United States",
+        type: "veg",
+        meal: "dessert",
+        image: "https://source.unsplash.com/800x600/?apple,pie",
+        summary: "Baked pie filled with spiced apples.",
+        ingredients: ["Pie crust", "Apples", "Sugar", "Butter", "Lemon juice", "Flour"],
+        spices: ["Cinnamon", "Nutmeg", "Salt"],
+        steps: ["Slice apples.", "Mix apples with sugar, lemon, flour, cinnamon, nutmeg, and salt.", "Place crust in pie dish.", "Add apple filling.", "Dot with butter.", "Cover with top crust.", "Bake until golden.", "Cool before slicing."]
+      },
+      {
+        name: "Chole Masala",
+        country: "India",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?chole,masala",
+        summary: "North Indian chickpea curry with bold spices.",
+        ingredients: ["Boiled chickpeas", "Onion", "Tomato", "Ginger-garlic paste", "Oil", "Coriander leaves"],
+        spices: ["Chole masala", "Cumin", "Turmeric", "Red chilli powder", "Garam masala", "Salt"],
+        steps: ["Heat oil in a pan.", "Add cumin and chopped onion.", "Cook until onion turns golden.", "Add ginger-garlic paste and tomato.", "Cook until oil separates.", "Add spices and boiled chickpeas.", "Add water and simmer.", "Garnish with coriander and serve."]
+      },
+      {
+        name: "Rajma Masala",
+        country: "India",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?rajma,masala",
+        summary: "Kidney bean curry served with rice.",
+        ingredients: ["Boiled rajma", "Onion", "Tomato", "Ginger-garlic paste", "Oil", "Water"],
+        spices: ["Cumin", "Turmeric", "Coriander powder", "Red chilli powder", "Garam masala", "Salt"],
+        steps: ["Soak rajma overnight and boil until soft.", "Heat oil and add cumin.", "Cook onion until golden.", "Add ginger-garlic paste and tomato.", "Cook into a thick masala.", "Add spices and rajma.", "Simmer until gravy thickens.", "Serve with steamed rice."]
+      },
+      {
+        name: "Aloo Gobi",
+        country: "India",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?aloo,gobi",
+        summary: "Dry potato and cauliflower sabzi.",
+        ingredients: ["Potatoes", "Cauliflower", "Tomato", "Ginger", "Oil", "Coriander leaves"],
+        spices: ["Cumin", "Turmeric", "Red chilli powder", "Coriander powder", "Garam masala", "Salt"],
+        steps: ["Cut potatoes and cauliflower.", "Heat oil and add cumin.", "Add potatoes and cook for 5 minutes.", "Add cauliflower and tomato.", "Add spices and mix.", "Cover and cook on low heat.", "Stir occasionally until tender.", "Garnish with coriander."]
+      },
+      {
+        name: "Palak Paneer",
+        country: "India",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?palak,paneer",
+        summary: "Paneer cubes in creamy spinach gravy.",
+        ingredients: ["Paneer", "Spinach", "Onion", "Tomato", "Garlic", "Cream", "Oil"],
+        spices: ["Cumin", "Garam masala", "Green chilli", "Salt"],
+        steps: ["Blanch spinach for 2 minutes.", "Blend spinach into puree.", "Heat oil and add cumin.", "Cook onion, garlic, tomato, and chilli.", "Add spinach puree and salt.", "Simmer for 5 minutes.", "Add paneer and garam masala.", "Finish with cream."]
+      },
+      {
+        name: "Baingan Bharta",
+        country: "India",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?baingan,bharta",
+        summary: "Smoky mashed eggplant cooked with onion and tomato.",
+        ingredients: ["Eggplant", "Onion", "Tomato", "Garlic", "Green chilli", "Oil", "Coriander leaves"],
+        spices: ["Cumin", "Turmeric", "Red chilli powder", "Garam masala", "Salt"],
+        steps: ["Roast eggplant until soft and smoky.", "Peel and mash it.", "Heat oil and add cumin.", "Cook onion, garlic, and chilli.", "Add tomato and spices.", "Add mashed eggplant.", "Cook until thick.", "Garnish and serve."]
+      },
+      {
+        name: "Malai Kofta",
+        country: "India",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?malai,kofta",
+        summary: "Soft vegetable-paneer balls in rich creamy gravy.",
+        ingredients: ["Paneer", "Boiled potato", "Cornflour", "Onion", "Tomato", "Cashews", "Cream", "Oil"],
+        spices: ["Garam masala", "Cardamom", "Red chilli powder", "Turmeric", "Salt"],
+        steps: ["Mash paneer and potato.", "Add cornflour and salt.", "Shape small kofta balls.", "Fry until golden.", "Cook onion, tomato, cashews, and spices.", "Blend into smooth gravy.", "Add cream and simmer.", "Place koftas in gravy before serving."]
+      },
+      {
+        name: "Sambar",
+        country: "India",
+        type: "veg",
+        meal: "breakfast",
+        image: "https://source.unsplash.com/800x600/?sambar",
+        summary: "South Indian lentil and vegetable stew.",
+        ingredients: ["Toor dal", "Mixed vegetables", "Tamarind", "Tomato", "Curry leaves", "Oil"],
+        spices: ["Sambar powder", "Mustard seeds", "Fenugreek", "Turmeric", "Asafoetida", "Salt"],
+        steps: ["Boil dal until soft.", "Cook vegetables with tomato and turmeric.", "Add tamarind water.", "Add sambar powder and salt.", "Mix in cooked dal.", "Simmer until flavors combine.", "Temper mustard seeds, curry leaves, and asafoetida.", "Pour tempering into sambar."]
+      },
+      {
+        name: "Idli",
+        country: "India",
+        type: "veg",
+        meal: "breakfast",
+        image: "https://source.unsplash.com/800x600/?idli",
+        summary: "Soft steamed rice and lentil cakes.",
+        ingredients: ["Idli rice", "Urad dal", "Fenugreek seeds", "Water", "Oil"],
+        spices: ["Salt"],
+        steps: ["Soak rice and dal separately.", "Grind into smooth batter.", "Mix and ferment overnight.", "Add salt gently.", "Grease idli moulds.", "Pour batter into moulds.", "Steam for 10 to 12 minutes.", "Serve with chutney and sambar."]
+      },
+      {
+        name: "Upma",
+        country: "India",
+        type: "veg",
+        meal: "breakfast",
+        image: "https://source.unsplash.com/800x600/?upma",
+        summary: "Savory semolina breakfast with vegetables.",
+        ingredients: ["Semolina", "Onion", "Carrot", "Peas", "Green chilli", "Ghee or oil", "Water"],
+        spices: ["Mustard seeds", "Curry leaves", "Urad dal", "Salt"],
+        steps: ["Dry roast semolina and keep aside.", "Heat oil and add mustard seeds.", "Add urad dal, curry leaves, chilli, and onion.", "Add vegetables and cook briefly.", "Add water and salt.", "Bring to a boil.", "Add semolina slowly while stirring.", "Cook until thick and soft."]
+      },
+      {
+        name: "Pav Bhaji",
+        country: "India",
+        type: "veg",
+        meal: "snack",
+        image: "https://source.unsplash.com/800x600/?pav,bhaji",
+        summary: "Spiced mashed vegetable curry served with buttered bread.",
+        ingredients: ["Potatoes", "Cauliflower", "Peas", "Capsicum", "Tomatoes", "Onion", "Pav bread", "Butter"],
+        spices: ["Pav bhaji masala", "Red chilli powder", "Turmeric", "Salt"],
+        steps: ["Boil vegetables until soft.", "Mash them well.", "Heat butter and cook onion.", "Add tomato and capsicum.", "Add spices and cook.", "Add mashed vegetables.", "Simmer and mash until smooth.", "Serve with toasted butter pav."]
+      },
+      {
+        name: "Vegetable Pulao",
+        country: "India",
+        type: "veg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?vegetable,pulao",
+        summary: "Fragrant rice cooked with vegetables and whole spices.",
+        ingredients: ["Basmati rice", "Mixed vegetables", "Onion", "Ginger-garlic paste", "Ghee", "Water"],
+        spices: ["Cumin", "Bay leaf", "Cardamom", "Cloves", "Cinnamon", "Salt"],
+        steps: ["Wash and soak rice.", "Heat ghee and add whole spices.", "Cook onion until light golden.", "Add ginger-garlic paste and vegetables.", "Add rice and stir gently.", "Add water and salt.", "Cover and cook on low heat.", "Rest for 5 minutes before serving."]
+      },
+      {
+        name: "Butter Chicken",
+        country: "India",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?butter,chicken",
+        summary: "Creamy tomato chicken curry.",
+        ingredients: ["Chicken", "Tomatoes", "Butter", "Cream", "Curd", "Ginger-garlic paste", "Cashews"],
+        spices: ["Kashmiri chilli powder", "Garam masala", "Turmeric", "Kasuri methi", "Salt"],
+        steps: ["Marinate chicken with curd and spices.", "Cook chicken until lightly charred.", "Cook tomatoes, cashews, and spices.", "Blend into smooth sauce.", "Heat butter and add sauce.", "Add chicken and simmer.", "Add cream and kasuri methi.", "Serve with naan or rice."]
+      },
+      {
+        name: "Chicken Tikka",
+        country: "India",
+        type: "nonveg",
+        meal: "snack",
+        image: "https://source.unsplash.com/800x600/?chicken,tikka",
+        summary: "Marinated chicken pieces grilled until smoky.",
+        ingredients: ["Boneless chicken", "Curd", "Ginger-garlic paste", "Lemon juice", "Oil"],
+        spices: ["Kashmiri chilli powder", "Cumin powder", "Garam masala", "Turmeric", "Salt"],
+        steps: ["Cut chicken into cubes.", "Mix curd, lemon, paste, spices, and oil.", "Marinate chicken for at least 1 hour.", "Thread chicken onto skewers.", "Grill or pan cook on high heat.", "Turn until cooked on all sides.", "Brush with oil or butter.", "Serve with onion and chutney."]
+      },
+      {
+        name: "Rogan Josh",
+        country: "India",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?rogan,josh",
+        summary: "Kashmiri-style mutton curry with deep red gravy.",
+        ingredients: ["Mutton", "Curd", "Ghee", "Ginger paste", "Water"],
+        spices: ["Kashmiri chilli powder", "Fennel powder", "Dry ginger powder", "Cardamom", "Cloves", "Salt"],
+        steps: ["Heat ghee in a heavy pot.", "Sear mutton pieces.", "Add ginger paste and spices.", "Whisk curd and add slowly.", "Cook until oil separates.", "Add water and salt.", "Cover and simmer until tender.", "Reduce gravy and serve."]
+      },
+      {
+        name: "Fish Curry",
+        country: "India",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?indian,fish,curry",
+        summary: "Tangy Indian fish curry with coconut or tomato gravy.",
+        ingredients: ["Fish pieces", "Onion", "Tomato", "Coconut milk", "Tamarind", "Oil", "Curry leaves"],
+        spices: ["Mustard seeds", "Turmeric", "Red chilli powder", "Coriander powder", "Salt"],
+        steps: ["Marinate fish with turmeric and salt.", "Heat oil and add mustard seeds.", "Add curry leaves and onion.", "Add tomato and spices.", "Add tamarind water and coconut milk.", "Simmer the gravy.", "Add fish pieces gently.", "Cook until fish is done."]
+      },
+      {
+        name: "Egg Bhurji",
+        country: "India",
+        type: "nonveg",
+        meal: "breakfast",
+        image: "https://source.unsplash.com/800x600/?egg,bhurji",
+        summary: "Indian spiced scrambled eggs.",
+        ingredients: ["Eggs", "Onion", "Tomato", "Green chilli", "Coriander leaves", "Oil"],
+        spices: ["Turmeric", "Red chilli powder", "Cumin", "Garam masala", "Salt"],
+        steps: ["Beat eggs with salt.", "Heat oil and add cumin.", "Cook onion and green chilli.", "Add tomato and spices.", "Pour in beaten eggs.", "Stir continuously.", "Cook until softly scrambled.", "Garnish with coriander."]
+      },
+      {
+        name: "Keema Matar",
+        country: "India",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?keema,matar",
+        summary: "Minced meat cooked with peas and masala.",
+        ingredients: ["Minced meat", "Peas", "Onion", "Tomato", "Ginger-garlic paste", "Oil"],
+        spices: ["Cumin", "Turmeric", "Red chilli powder", "Coriander powder", "Garam masala", "Salt"],
+        steps: ["Heat oil and add cumin.", "Cook onion until golden.", "Add ginger-garlic paste.", "Add tomato and spices.", "Add minced meat and brown it.", "Add peas and a little water.", "Cover and cook until done.", "Finish with garam masala."]
+      },
+      {
+        name: "Chicken Korma",
+        country: "India",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?chicken,korma",
+        summary: "Mild creamy chicken curry with nuts and yogurt.",
+        ingredients: ["Chicken", "Curd", "Onion", "Cashews", "Cream", "Ghee"],
+        spices: ["Cardamom", "Cloves", "Cinnamon", "Coriander powder", "White pepper", "Salt"],
+        steps: ["Fry onions until golden.", "Blend onions with cashews and curd.", "Heat ghee and add whole spices.", "Add chicken and sear.", "Add the blended paste.", "Cook until oil separates.", "Add water and simmer.", "Finish with cream."]
+      },
+      {
+        name: "Prawn Masala",
+        country: "India",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?prawn,masala",
+        summary: "Spicy prawns cooked in onion-tomato masala.",
+        ingredients: ["Prawns", "Onion", "Tomato", "Ginger-garlic paste", "Oil", "Coriander leaves"],
+        spices: ["Turmeric", "Red chilli powder", "Coriander powder", "Garam masala", "Salt"],
+        steps: ["Clean prawns.", "Marinate with turmeric and salt.", "Heat oil and cook onion.", "Add ginger-garlic paste and tomato.", "Add spices and cook masala.", "Add prawns.", "Cook for 4 to 6 minutes.", "Garnish and serve."]
+      },
+      {
+        name: "Hyderabadi Haleem",
+        country: "India",
+        type: "nonveg",
+        meal: "dinner",
+        image: "https://source.unsplash.com/800x600/?haleem",
+        summary: "Slow-cooked meat, wheat, and lentil stew.",
+        ingredients: ["Mutton or chicken", "Broken wheat", "Mixed lentils", "Fried onions", "Ghee", "Ginger-garlic paste"],
+        spices: ["Garam masala", "Black pepper", "Cumin", "Cardamom", "Cinnamon", "Salt"],
+        steps: ["Soak wheat and lentils.", "Cook meat with ginger-garlic paste and spices.", "Boil wheat and lentils until soft.", "Combine meat and grain mixture.", "Mash or blend until thick.", "Cook slowly with ghee.", "Top with fried onions.", "Serve hot with lemon."]
+      },
+      {
+        name: "Chicken Tikka",
+        country: "India",
+        type: "nonveg",
+        protein: "chicken",
+        meal: "snack",
+        category: "fastfood",
+        emoji: "🍗",
+        image: "https://source.unsplash.com/800x600/?chicken,tikka",
+        summary: "Smoky grilled chicken cubes with bold Indian spices.",
+        ingredients: ["Chicken", "Curd", "Ginger-garlic paste", "Lemon juice", "Oil", "Capsicum"],
+        spices: ["Kashmiri chilli", "Turmeric", "Coriander powder", "Garam masala", "Salt"],
+        steps: ["Cut chicken into bite-size pieces.", "Mix curd, lemon juice, ginger-garlic paste, and spices.", "Marinate chicken for 30 minutes.", "Skewer with onion and capsicum.", "Roast or grill until charred.", "Brush with oil or butter.", "Cook until juicy inside.", "Serve hot with mint chutney."]
+      },
+      {
+        name: "Butter Chicken",
+        country: "India",
+        type: "nonveg",
+        protein: "chicken",
+        meal: "dinner",
+        emoji: "🍗",
+        image: "https://source.unsplash.com/800x600/?butter,chicken",
+        summary: "Creamy tomato gravy with tender chicken pieces.",
+        ingredients: ["Chicken", "Tomato puree", "Butter", "Cream", "Onion", "Ginger-garlic paste"],
+        spices: ["Kashmiri chilli", "Turmeric", "Garam masala", "Kasuri methi", "Salt"],
+        steps: ["Marinate chicken lightly with spices.", "Cook chicken until almost done.", "Heat butter and saute onion.", "Add ginger-garlic paste and tomato puree.", "Cook until the gravy thickens.", "Add spices and chicken.", "Finish with cream and kasuri methi.", "Serve with naan or rice."]
+      },
+      {
+        name: "Chicken Shawarma Roll",
+        country: "Middle East",
+        type: "nonveg",
+        protein: "chicken",
+        meal: "snack",
+        category: "fastfood",
+        emoji: "🌯",
+        image: "https://source.unsplash.com/800x600/?chicken,shawarma",
+        summary: "Juicy chicken strips wrapped with sauce and salad.",
+        ingredients: ["Chicken", "Pita or rumali roti", "Curd", "Garlic sauce", "Onion", "Lettuce"],
+        spices: ["Paprika", "Black pepper", "Cumin", "Coriander powder", "Salt"],
+        steps: ["Marinate chicken with curd and spices.", "Pan-sear or grill the chicken.", "Slice the cooked chicken thin.", "Warm the flatbread.", "Spread garlic sauce.", "Add chicken, onion, and lettuce.", "Roll tightly.", "Serve immediately."]
+      },
+      {
+        name: "Mutton Rogan Josh",
+        country: "India",
+        type: "nonveg",
+        protein: "mutton",
+        meal: "dinner",
+        emoji: "🍖",
+        image: "https://source.unsplash.com/800x600/?mutton,rogan,josh",
+        summary: "Deep red Kashmiri mutton curry with rich flavor.",
+        ingredients: ["Mutton", "Curd", "Onion", "Mustard oil", "Ginger-garlic paste", "Water"],
+        spices: ["Kashmiri chilli", "Fennel powder", "Dry ginger powder", "Cinnamon", "Cloves", "Salt"],
+        steps: ["Heat mustard oil.", "Brown the mutton pieces.", "Add onion and ginger-garlic paste.", "Mix in curd and spices.", "Cook until oil releases.", "Add water.", "Simmer until mutton turns tender.", "Serve hot with rice."]
+      },
+      {
+        name: "Mutton Seekh Kebab",
+        country: "India",
+        type: "nonveg",
+        protein: "mutton",
+        meal: "snack",
+        category: "fastfood",
+        emoji: "🍢",
+        image: "https://source.unsplash.com/800x600/?mutton,kebab",
+        summary: "Spiced minced mutton kebabs roasted until smoky.",
+        ingredients: ["Minced mutton", "Onion", "Green chilli", "Ginger-garlic paste", "Coriander leaves", "Oil"],
+        spices: ["Cumin", "Garam masala", "Black pepper", "Chilli flakes", "Salt"],
+        steps: ["Mix minced mutton with onion, chilli, herbs, and spices.", "Rest the mixture for 20 minutes.", "Shape around skewers.", "Brush lightly with oil.", "Roast or grill until browned.", "Turn once or twice.", "Cook until juicy and firm.", "Serve with onion rings."]
+      },
+      {
+        name: "Palak Paneer",
+        country: "India",
+        type: "veg",
+        meal: "dinner",
+        emoji: "🥬",
+        image: "https://source.unsplash.com/800x600/?palak,paneer",
+        summary: "Paneer cubes in a smooth spinach gravy.",
+        ingredients: ["Paneer", "Spinach", "Onion", "Tomato", "Garlic", "Cream"],
+        spices: ["Cumin", "Garam masala", "Black pepper", "Salt"],
+        steps: ["Blanch spinach and cool it.", "Blend spinach into a smooth puree.", "Saute onion and garlic.", "Add tomato and cook well.", "Mix in spinach puree and spices.", "Add paneer cubes.", "Simmer for a few minutes.", "Finish with cream."]
+      },
+      {
+        name: "Veg Noodles",
+        country: "China",
+        type: "veg",
+        meal: "snack",
+        category: "fastfood",
+        emoji: "🍜",
+        image: "https://source.unsplash.com/800x600/?veg,noodles",
+        summary: "Street-style noodles tossed with crunchy vegetables.",
+        ingredients: ["Noodles", "Carrot", "Cabbage", "Capsicum", "Spring onion", "Oil"],
+        spices: ["Soy sauce", "Black pepper", "Vinegar", "Salt"],
+        steps: ["Boil noodles until just done.", "Drain and cool them.", "Heat oil in a wok.", "Stir fry vegetables on high heat.", "Add noodles and seasonings.", "Toss quickly.", "Add spring onion.", "Serve hot."]
+      },
+      {
+        name: "Mushroom Masala",
+        country: "India",
+        type: "veg",
+        meal: "lunch",
+        emoji: "🍄",
+        image: "https://source.unsplash.com/800x600/?mushroom,curry",
+        summary: "Mushrooms cooked in onion-tomato masala gravy.",
+        ingredients: ["Mushrooms", "Onion", "Tomato", "Ginger-garlic paste", "Oil", "Coriander leaves"],
+        spices: ["Turmeric", "Chilli powder", "Coriander powder", "Garam masala", "Salt"],
+        steps: ["Clean and slice mushrooms.", "Cook onion until golden.", "Add ginger-garlic paste and tomato.", "Cook the masala well.", "Add spices.", "Add mushrooms.", "Cook until tender.", "Garnish with coriander."]
+      },
+      {
+        name: "Cheese Corn Sandwich",
+        country: "India",
+        type: "veg",
+        meal: "breakfast",
+        category: "junkfood",
+        emoji: "🥪",
+        image: "https://source.unsplash.com/800x600/?cheese,sandwich",
+        summary: "Toasted sandwich with sweet corn and melted cheese.",
+        ingredients: ["Bread", "Sweet corn", "Cheese", "Butter", "Onion", "Capsicum"],
+        spices: ["Black pepper", "Chilli flakes", "Oregano", "Salt"],
+        steps: ["Mix corn, cheese, onion, and capsicum.", "Season the filling.", "Butter the bread slices.", "Spread the filling evenly.", "Close the sandwich.", "Toast until golden.", "Slice in halves.", "Serve hot."]
+      },
+      {
+        name: "Veg Burger",
+        country: "United States",
+        type: "veg",
+        meal: "snack",
+        category: "fastfood",
+        emoji: "🍔",
+        image: "https://source.unsplash.com/800x600/?veg,burger",
+        summary: "Crispy vegetable patty burger with sauces and salad.",
+        ingredients: ["Burger buns", "Veg patty", "Lettuce", "Tomato", "Onion", "Mayonnaise"],
+        spices: ["Black pepper", "Chilli flakes", "Salt"],
+        steps: ["Toast the burger buns.", "Cook the veg patty until crisp.", "Spread sauce on buns.", "Layer lettuce, patty, onion, and tomato.", "Close the burger.", "Press gently.", "Serve with fries.", "Enjoy hot."]
+      },
+      {
+        name: "French Fries",
+        country: "Belgium",
+        type: "veg",
+        meal: "snack",
+        category: "junkfood",
+        emoji: "🍟",
+        image: "https://source.unsplash.com/800x600/?french,fries",
+        summary: "Golden crisp potato fries with simple seasoning.",
+        ingredients: ["Potatoes", "Oil", "Cornflour"],
+        spices: ["Salt", "Paprika", "Black pepper"],
+        steps: ["Cut potatoes into strips.", "Soak and dry them well.", "Fry once on medium heat.", "Cool for a few minutes.", "Fry again until crisp.", "Drain extra oil.", "Sprinkle seasoning.", "Serve immediately."]
+      },
+      {
+        name: "Cheese Burst Pizza",
+        country: "Italy",
+        type: "veg",
+        meal: "snack",
+        category: "junkfood",
+        emoji: "🍕",
+        image: "https://source.unsplash.com/800x600/?cheese,pizza",
+        summary: "Extra cheesy pizza loaded with sauce and toppings.",
+        ingredients: ["Pizza dough", "Mozzarella", "Cheese sauce", "Capsicum", "Onion", "Tomato sauce"],
+        spices: ["Oregano", "Chilli flakes", "Salt"],
+        steps: ["Roll out the pizza dough.", "Add cheese sauce at the center.", "Seal with another thin layer of dough.", "Spread tomato sauce.", "Add cheese and toppings.", "Bake until golden.", "Rest for a minute.", "Slice and serve."]
+      },
+      {
+        name: "Cold Coffee",
+        country: "India",
+        type: "veg",
+        meal: "snack",
+        category: "colddrink",
+        emoji: "🧋",
+        image: "https://source.unsplash.com/800x600/?cold,coffee",
+        summary: "Chilled creamy coffee blended with milk and ice.",
+        ingredients: ["Cold milk", "Coffee", "Sugar", "Ice cubes", "Vanilla ice cream"],
+        spices: ["Cocoa powder"],
+        steps: ["Add milk, coffee, sugar, and ice to a blender.", "Blend until frothy.", "Pour into a tall glass.", "Top with ice cream if desired.", "Dust with cocoa powder.", "Serve chilled."]
+      },
+      {
+        name: "Mango Shake",
+        country: "India",
+        type: "veg",
+        meal: "snack",
+        category: "colddrink",
+        emoji: "🥭",
+        image: "https://source.unsplash.com/800x600/?mango,shake",
+        summary: "Sweet thick mango drink for hot summer days.",
+        ingredients: ["Mango", "Cold milk", "Sugar", "Ice cubes"],
+        spices: ["Cardamom powder"],
+        steps: ["Peel and chop ripe mango.", "Blend mango with milk and sugar.", "Add ice cubes.", "Blend again until smooth.", "Pour into a chilled glass.", "Serve immediately."]
+      },
+      {
+        name: "Lemon Soda",
+        country: "India",
+        type: "veg",
+        meal: "snack",
+        category: "colddrink",
+        emoji: "🍋",
+        image: "https://source.unsplash.com/800x600/?lemon,soda",
+        summary: "Refreshing fizzy lemon drink with a salty kick.",
+        ingredients: ["Lemon juice", "Chilled soda", "Sugar", "Ice cubes", "Mint"],
+        spices: ["Black salt", "Roasted cumin powder"],
+        steps: ["Add lemon juice to a glass.", "Mix in sugar and spices.", "Add ice cubes.", "Top with chilled soda.", "Stir gently.", "Garnish with mint.", "Serve at once."]
+      },
+      {
+        name: "Cola Float",
+        country: "United States",
+        type: "veg",
+        meal: "snack",
+        category: "colddrink",
+        emoji: "🥤",
+        image: "https://source.unsplash.com/800x600/?cola,drink",
+        summary: "Classic chilled cola served with a scoop of ice cream.",
+        ingredients: ["Chilled cola", "Vanilla ice cream", "Ice cubes"],
+        spices: [],
+        steps: ["Fill a tall glass with a few ice cubes.", "Pour in chilled cola slowly.", "Top with vanilla ice cream.", "Serve immediately with a straw."]
+      }
+    ];
+
+    const indianStateCollections = [
+      {
+        title: "Punjab",
+        subtitle: "Rich North Indian comfort food",
+        dishes: ["Butter Chicken", "Chole Masala", "Rajma Masala", "Paneer Butter Masala", "Lassi"]
+      },
+      {
+        title: "Delhi",
+        subtitle: "Street food and Mughlai favorites",
+        dishes: ["Chole Masala", "Chicken Tikka", "Butter Chicken", "Paratha", "Aloo Tikki"]
+      },
+      {
+        title: "Maharashtra",
+        subtitle: "Bold snacks and city favorites",
+        dishes: ["Pav Bhaji", "Poha", "Misal Pav", "Vada Pav", "Puran Poli"]
+      },
+      {
+        title: "Gujarat",
+        subtitle: "Sweet, savory, and snack-heavy food",
+        dishes: ["Dhokla", "Thepla", "Undhiyu", "Khandvi", "Gujarati Kadhi"]
+      },
+      {
+        title: "Rajasthan",
+        subtitle: "Royal desert-state recipes",
+        dishes: ["Dal Baati Churma", "Gatte Ki Sabzi", "Laal Maas", "Ker Sangri", "Malpua"]
+      },
+      {
+        title: "West Bengal",
+        subtitle: "Fish, sweets, and mustard flavors",
+        dishes: ["Fish Curry", "Rasgulla", "Mishti Doi", "Shorshe Ilish", "Aloo Posto"]
+      },
+      {
+        title: "Tamil Nadu",
+        subtitle: "Rice, lentils, sambar, and tiffin",
+        dishes: ["Idli", "Sambar", "Dosa", "Pongal", "Chettinad Chicken"]
+      },
+      {
+        title: "Kerala",
+        subtitle: "Coconut-rich coastal cooking",
+        dishes: ["Fish Curry", "Appam", "Prawn Masala", "Avial", "Kerala Sadya"]
+      },
+      {
+        title: "Hyderabad / Telangana",
+        subtitle: "Nizami-style rice and slow-cooked dishes",
+        dishes: ["Chicken Biryani", "Hyderabadi Haleem", "Chicken Korma", "Double Ka Meetha", "Mirchi Ka Salan"]
+      },
+      {
+        title: "Karnataka",
+        subtitle: "Breakfast classics and regional rice dishes",
+        dishes: ["Masala Dosa", "Upma", "Bisi Bele Bath", "Mysore Pak", "Ragi Mudde"]
+      },
+      {
+        title: "Goa",
+        subtitle: "Coastal curries and Portuguese influence",
+        dishes: ["Fish Curry", "Prawn Masala", "Chicken Xacuti", "Vindaloo", "Bebinca"]
+      },
+      {
+        title: "Kashmir",
+        subtitle: "Aromatic meat curries and warming dishes",
+        dishes: ["Rogan Josh", "Yakhni", "Dum Aloo", "Gushtaba", "Kahwa"]
+      }
+    ];
+
+    const countryCollections = [
+      {
+        title: "India",
+        subtitle: "Spiced curries, rice dishes, snacks, and sweets",
+        dishes: ["Paneer Butter Masala", "Chicken Biryani", "Masala Dosa", "Chole Masala", "Butter Chicken", "Gulab Jamun"]
+      },
+      {
+        title: "Italy",
+        subtitle: "Pasta, pizza, herbs, cheese, and olive oil",
+        dishes: ["Pizza Margherita", "Pasta Carbonara", "Risotto", "Lasagna", "Tiramisu"]
+      },
+      {
+        title: "Japan",
+        subtitle: "Rice, noodles, seafood, and clean flavors",
+        dishes: ["Sushi Rolls", "Ramen", "Tempura", "Okonomiyaki", "Miso Soup"]
+      },
+      {
+        title: "Thailand",
+        subtitle: "Sweet, sour, spicy, and aromatic dishes",
+        dishes: ["Pad Thai", "Thai Green Curry", "Tom Yum Soup", "Mango Sticky Rice", "Som Tam"]
+      },
+      {
+        title: "Mexico",
+        subtitle: "Corn, beans, chilli, lime, and fresh toppings",
+        dishes: ["Tacos", "Guacamole", "Enchiladas", "Quesadilla", "Churros"]
+      },
+      {
+        title: "Spain",
+        subtitle: "Rice, seafood, paprika, and shared plates",
+        dishes: ["Paella", "Tortilla Española", "Gazpacho", "Patatas Bravas", "Churros"]
+      },
+      {
+        title: "United States",
+        subtitle: "Breakfast classics, burgers, pies, and comfort food",
+        dishes: ["Beef Burger", "Pancakes", "Apple Pie", "Fried Chicken", "Mac and Cheese"]
+      },
+      {
+        title: "France",
+        subtitle: "Elegant sauces, pastries, eggs, and stews",
+        dishes: ["French Omelette", "Ratatouille", "Croissant", "Coq au Vin", "Creme Brulee"]
+      },
+      {
+        title: "Middle East",
+        subtitle: "Chickpeas, herbs, grilled dishes, and dips",
+        dishes: ["Falafel", "Hummus", "Shawarma", "Kebab", "Baklava"]
+      },
+      {
+        title: "Greece",
+        subtitle: "Olive oil, feta, herbs, vegetables, and grilled food",
+        dishes: ["Greek Salad", "Moussaka", "Souvlaki", "Spanakopita", "Baklava"]
+      }
+    ];
+
+    const translations = {
+      en: {
+        pageTitle: "SpiceRoute Recipe Studio",
+        brandShort: "SpiceRoute",
+        siteIntro: "Beautiful recipe cards with images, ingredients, spices, and step-by-step cooking help. Switch the site language anytime to make browsing easier for more users.",
+        darkMode: "Dark Mode",
+        language: "Language",
+        states: "Indian States",
+        countries: "Countries",
+        searchPlaceholder: "Search recipes, countries, ingredients...",
+        breakfastHeading: "1. Breakfast Recipes",
+        lunchHeading: "2. Lunch Recipes",
+        dinnerHeading: "3. Dinner Recipes",
+        filterAll: "All 🍽️",
+        filterVeg: "Veg 🥦",
+        filterNonVeg: "Non-Veg 🍖",
+        filterChicken: "Chicken 🍗",
+        filterMutton: "Mutton 🍖",
+        filterFastFood: "Fast Food 🍔",
+        filterJunkFood: "Junk Food 🍟",
+        filterColdDrink: "Cold Drinks 🥤",
+        filterBreakfast: "Breakfast 🍳",
+        filterLunch: "Lunch 🍛",
+        filterDinner: "Dinner 🍽️",
+        filterDessert: "Dessert 🍰",
+        filterSnack: "Snack 🌮",
+        back: "Back to Recipes",
+        open: "Open",
+        openFullRecipe: "Open Full Recipe",
+        searchDish: "Search This Dish",
+        stateWise: "India State Wise",
+        countryWise: "Country Wise",
+        famousDishes: "{count} famous dishes",
+        famousFrom: "Famous recipes from",
+        famousOf: "Famous dishes of",
+        alreadyAvailable: "This recipe is already available in SpiceRoute.",
+        famousDishIdea: "Famous dish idea. You can add its full ingredients and steps later.",
+        ingredients: "Ingredients",
+        spices: "Spices and Seasoning",
+        steps: "Cooking Steps",
+        statsShown: "{visible} of {total} recipes shown",
+        vegLabel: "Veg",
+        nonvegLabel: "Non-Veg",
+        chickenLabel: "Chicken",
+        muttonLabel: "Mutton",
+        fastFoodLabel: "Fast Food",
+        junkFoodLabel: "Junk Food",
+        coldDrinkLabel: "Cold Drink",
+        breakfastLabel: "Breakfast",
+        lunchLabel: "Lunch",
+        dinnerLabel: "Dinner",
+        dessertLabel: "Dessert",
+        snackLabel: "Snack",
+        stepsCount: "{count} steps"
+      },
+      hi: {
+        pageTitle: "स्पाइस रूट रेसिपी स्टूडियो",
+        brandShort: "स्पाइस रूट",
+        siteIntro: "सुंदर रेसिपी कार्ड, जिनमें तस्वीरें, सामग्री, मसाले और आसान स्टेप-बाय-स्टेप कुकिंग मदद है। साइट की भाषा कभी भी बदलें ताकि हर यूज़र आसानी से देख सके।",
+        darkMode: "डार्क मोड",
+        language: "भाषा",
+        states: "भारतीय राज्य",
+        countries: "देश",
+        searchPlaceholder: "रेसिपी, देश, सामग्री खोजें...",
+        breakfastHeading: "1. नाश्ते की रेसिपी",
+        lunchHeading: "2. दोपहर के खाने की रेसिपी",
+        dinnerHeading: "3. रात के खाने की रेसिपी",
+        filterAll: "सभी 🍽️",
+        filterVeg: "शाकाहारी 🥦",
+        filterNonVeg: "नॉन-वेज 🍖",
+        filterChicken: "चिकन 🍗",
+        filterMutton: "मटन 🍖",
+        filterFastFood: "फास्ट फूड 🍔",
+        filterJunkFood: "जंक फूड 🍟",
+        filterColdDrink: "कोल्ड ड्रिंक्स 🥤",
+        filterBreakfast: "नाश्ता 🍳",
+        filterLunch: "लंच 🍛",
+        filterDinner: "डिनर 🍽️",
+        filterDessert: "मिठाई 🍰",
+        filterSnack: "स्नैक्स 🌮",
+        back: "रेसिपी पर वापस जाएं",
+        open: "खोलें",
+        openFullRecipe: "पूरी रेसिपी खोलें",
+        searchDish: "यह डिश खोजें",
+        stateWise: "भारत राज्य अनुसार",
+        countryWise: "देश अनुसार",
+        famousDishes: "{count} मशहूर डिश",
+        famousFrom: "यहां की मशहूर रेसिपी",
+        famousOf: "यहां के मशहूर व्यंजन",
+        alreadyAvailable: "यह रेसिपी पहले से SpiceRoute में उपलब्ध है।",
+        famousDishIdea: "यह एक मशहूर डिश आइडिया है। आप बाद में इसकी पूरी सामग्री और स्टेप्स जोड़ सकते हैं।",
+        ingredients: "सामग्री",
+        spices: "मसाले और सीज़निंग",
+        steps: "बनाने के स्टेप्स",
+        statsShown: "{visible} में से {total} रेसिपी दिखाई गईं",
+        vegLabel: "शाकाहारी",
+        nonvegLabel: "नॉन-वेज",
+        chickenLabel: "चिकन",
+        muttonLabel: "मटन",
+        fastFoodLabel: "फास्ट फूड",
+        junkFoodLabel: "जंक फूड",
+        coldDrinkLabel: "कोल्ड ड्रिंक",
+        breakfastLabel: "नाश्ता",
+        lunchLabel: "लंच",
+        dinnerLabel: "डिनर",
+        dessertLabel: "मिठाई",
+        snackLabel: "स्नैक्स",
+        stepsCount: "{count} स्टेप्स"
+      },
+      gu: {
+        pageTitle: "સ્પાઇસ રૂટ રેસીપી સ્ટુડિયો",
+        brandShort: "સ્પાઇસ રૂટ",
+        siteIntro: "સુંદર રેસીપી કાર્ડ્સ, જેમાં તસવીરો, સામગ્રી, મસાલા અને સ્ટેપ-બાય-સ્ટેપ રસોઈ માર્ગદર્શન છે. વધુ સરળ અનુભવ માટે સાઇટની ભાષા ક્યારે પણ બદલો.",
+        darkMode: "ડાર્ક મોડ",
+        language: "ભાષા",
+        states: "ભારતીય રાજ્યો",
+        countries: "દેશો",
+        searchPlaceholder: "રસોઈ, દેશ, સામગ્રી શોધો...",
+        breakfastHeading: "1. નાસ્તાની રેસીપી",
+        lunchHeading: "2. બપોરના ભોજનની રેસીપી",
+        dinnerHeading: "3. રાત્રિના ભોજનની રેસીપી",
+        filterAll: "બધું 🍽️",
+        filterVeg: "શાકાહારી 🥦",
+        filterNonVeg: "નૉન-વેજ 🍖",
+        filterChicken: "ચિકન 🍗",
+        filterMutton: "મટન 🍖",
+        filterFastFood: "ફાસ્ટ ફૂડ 🍔",
+        filterJunkFood: "જંક ફૂડ 🍟",
+        filterColdDrink: "કોલ્ડ ડ્રિંક્સ 🥤",
+        filterBreakfast: "નાસ્તો 🍳",
+        filterLunch: "લંચ 🍛",
+        filterDinner: "ડિનર 🍽️",
+        filterDessert: "ડેઝર્ટ 🍰",
+        filterSnack: "સ્નૅક્સ 🌮",
+        back: "રસોઈઓ પર પાછા જાઓ",
+        open: "ખોલો",
+        openFullRecipe: "પૂર્ણ રેસીપી ખોલો",
+        searchDish: "આ વાનગી શોધો",
+        stateWise: "ભારત રાજ્ય મુજબ",
+        countryWise: "દેશ મુજબ",
+        famousDishes: "{count} પ્રસિદ્ધ વાનગીઓ",
+        famousFrom: "અહીંની પ્રસિદ્ધ રેસીપીઓ",
+        famousOf: "અહીંના પ્રસિદ્ધ ભોજન",
+        alreadyAvailable: "આ રેસીપી પહેલેથી SpiceRoute માં ઉપલબ્ધ છે.",
+        famousDishIdea: "આ પ્રસિદ્ધ વાનગીનો વિચાર છે. તમે પછી તેની સંપૂર્ણ સામગ્રી અને સ્ટેપ્સ ઉમેરી શકો છો.",
+        ingredients: "સામગ્રી",
+        spices: "મસાલા અને સીઝનિંગ",
+        steps: "બનાવવાની રીત",
+        statsShown: "{total} માંથી {visible} રેસીપી દેખાઈ રહી છે",
+        vegLabel: "શાકાહારી",
+        nonvegLabel: "નૉન-વેજ",
+        chickenLabel: "ચિકન",
+        muttonLabel: "મટન",
+        fastFoodLabel: "ફાસ્ટ ફૂડ",
+        junkFoodLabel: "જંક ફૂડ",
+        coldDrinkLabel: "કોલ્ડ ડ્રિંક",
+        breakfastLabel: "નાસ્તો",
+        lunchLabel: "લંચ",
+        dinnerLabel: "ડિનર",
+        dessertLabel: "ડેઝર્ટ",
+        snackLabel: "સ્નૅક્સ",
+        stepsCount: "{count} પગલાં"
+      },
+      mr: {
+        pageTitle: "स्पाइस रूट रेसिपी स्टुडिओ",
+        brandShort: "स्पाइस रूट",
+        siteIntro: "सुंदर रेसिपी कार्ड्स, ज्यात फोटो, साहित्य, मसाले आणि स्टेप-बाय-स्टेप कुकिंग मार्गदर्शन आहे. वापरकर्त्यांना सोपे जावे म्हणून भाषा कधीही बदला.",
+        darkMode: "डार्क मोड",
+        language: "भाषा",
+        states: "भारतीय राज्ये",
+        countries: "देश",
+        searchPlaceholder: "रेसिपी, देश, साहित्य शोधा...",
+        breakfastHeading: "1. नाश्त्याच्या रेसिपी",
+        lunchHeading: "2. दुपारच्या जेवणाच्या रेसिपी",
+        dinnerHeading: "3. रात्रीच्या जेवणाच्या रेसिपी",
+        filterAll: "सर्व 🍽️",
+        filterVeg: "शाकाहारी 🥦",
+        filterNonVeg: "नॉन-व्हेज 🍖",
+        filterChicken: "चिकन 🍗",
+        filterMutton: "मटण 🍖",
+        filterFastFood: "फास्ट फूड 🍔",
+        filterJunkFood: "जंक फूड 🍟",
+        filterColdDrink: "कोल्ड ड्रिंक्स 🥤",
+        filterBreakfast: "नाश्ता 🍳",
+        filterLunch: "लंच 🍛",
+        filterDinner: "डिनर 🍽️",
+        filterDessert: "डेझर्ट 🍰",
+        filterSnack: "स्नॅक्स 🌮",
+        back: "रेसिपीकडे परत जा",
+        open: "उघडा",
+        openFullRecipe: "पूर्ण रेसिपी उघडा",
+        searchDish: "ही डिश शोधा",
+        stateWise: "भारत राज्यनिहाय",
+        countryWise: "देशनिहाय",
+        famousDishes: "{count} प्रसिद्ध पदार्थ",
+        famousFrom: "येथील प्रसिद्ध रेसिपी",
+        famousOf: "येथील प्रसिद्ध पदार्थ",
+        alreadyAvailable: "ही रेसिपी SpiceRoute मध्ये आधीपासून उपलब्ध आहे.",
+        famousDishIdea: "हा एक प्रसिद्ध पदार्थाचा आयडिया आहे. नंतर तुम्ही त्याची संपूर्ण सामग्री आणि स्टेप्स जोडू शकता.",
+        ingredients: "साहित्य",
+        spices: "मसाले आणि सीझनिंग",
+        steps: "कृती",
+        statsShown: "{total} पैकी {visible} रेसिपी दिसत आहेत",
+        vegLabel: "शाकाहारी",
+        nonvegLabel: "नॉन-व्हेज",
+        chickenLabel: "चिकन",
+        muttonLabel: "मटण",
+        fastFoodLabel: "फास्ट फूड",
+        junkFoodLabel: "जंक फूड",
+        coldDrinkLabel: "कोल्ड ड्रिंक",
+        breakfastLabel: "नाश्ता",
+        lunchLabel: "लंच",
+        dinnerLabel: "डिनर",
+        dessertLabel: "डेझर्ट",
+        snackLabel: "स्नॅक्स",
+        stepsCount: "{count} स्टेप्स"
+      },
+      te: {
+        pageTitle: "స్పైస్ రూట్ రెసిపీ స్టూడియో",
+        brandShort: "స్పైస్ రూట్",
+        siteIntro: "అందమైన రెసిపీ కార్డులు, చిత్రాలు, పదార్థాలు, మసాలాలు, మరియు స్టెప్-బై-స్టెప్ వంట సహాయంతో. ఎక్కువ మంది వినియోగదారులకు సులభంగా అర్థమయ్యేలా భాషను ఎప్పుడైనా మార్చండి.",
+        darkMode: "డార్క్ మోడ్",
+        language: "భాష",
+        states: "భారత రాష్ట్రాలు",
+        countries: "దేశాలు",
+        searchPlaceholder: "రెసిపీలు, దేశాలు, పదార్థాలు వెతకండి...",
+        breakfastHeading: "1. అల్పాహార రెసిపీలు",
+        lunchHeading: "2. మధ్యాహ్న భోజన రెసిపీలు",
+        dinnerHeading: "3. రాత్రి భోజన రెసిపీలు",
+        filterAll: "అన్నీ 🍽️",
+        filterVeg: "శాకాహారం 🥦",
+        filterNonVeg: "నాన్-వెజ్ 🍖",
+        filterChicken: "చికెన్ 🍗",
+        filterMutton: "మటన్ 🍖",
+        filterFastFood: "ఫాస్ట్ ఫుడ్ 🍔",
+        filterJunkFood: "జంక్ ఫుడ్ 🍟",
+        filterColdDrink: "చల్లని పానీయాలు 🥤",
+        filterBreakfast: "అల్పాహారం 🍳",
+        filterLunch: "లంచ్ 🍛",
+        filterDinner: "డిన్నర్ 🍽️",
+        filterDessert: "డెజర్ట్ 🍰",
+        filterSnack: "స్నాక్స్ 🌮",
+        back: "రెసిపీలకు తిరిగి వెళ్ళండి",
+        open: "తెరవండి",
+        openFullRecipe: "పూర్తి రెసిపీ తెరవండి",
+        searchDish: "ఈ వంటకం వెతకండి",
+        stateWise: "భారత రాష్ట్రాల వారీగా",
+        countryWise: "దేశాల వారీగా",
+        famousDishes: "{count} ప్రసిద్ధ వంటకాలు",
+        famousFrom: "ఇక్కడి ప్రసిద్ధ రెసిపీలు",
+        famousOf: "ఇక్కడి ప్రసిద్ధ వంటకాలు",
+        alreadyAvailable: "ఈ రెసిపీ ఇప్పటికే SpiceRoute లో అందుబాటులో ఉంది.",
+        famousDishIdea: "ఇది ఒక ప్రసిద్ధ వంటకం ఆలోచన. తర్వాత మీరు దీని పూర్తి పదార్థాలు మరియు స్టెప్స్ జోడించవచ్చు.",
+        ingredients: "పదార్థాలు",
+        spices: "మసాలాలు మరియు సీజనింగ్",
+        steps: "వంట విధానం",
+        statsShown: "{total} లో {visible} రెసిపీలు చూపిస్తున్నాం",
+        vegLabel: "శాకాహారం",
+        nonvegLabel: "నాన్-వెజ్",
+        chickenLabel: "చికెన్",
+        muttonLabel: "మటన్",
+        fastFoodLabel: "ఫాస్ట్ ఫుడ్",
+        junkFoodLabel: "జంక్ ఫుడ్",
+        coldDrinkLabel: "చల్లని పానీయం",
+        breakfastLabel: "అల్పాహారం",
+        lunchLabel: "లంచ్",
+        dinnerLabel: "డిన్నర్",
+        dessertLabel: "డెజర్ట్",
+        snackLabel: "స్నాక్స్",
+        stepsCount: "{count} దశలు"
+      },
+      bn: {
+        pageTitle: "স্পাইস রুট রেসিপি স্টুডিও",
+        brandShort: "স্পাইস রুট",
+        siteIntro: "সুন্দর রেসিপি কার্ড, ছবি, উপকরণ, মসলা আর ধাপে ধাপে রান্নার সাহায্যসহ। যেকোনো সময় ভাষা বদলে আরও সহজে সাইট ব্যবহার করা যাবে।",
+        darkMode: "ডার্ক মোড",
+        language: "ভাষা",
+        states: "ভারতের রাজ্য",
+        countries: "দেশ",
+        searchPlaceholder: "রেসিপি, দেশ, উপকরণ খুঁজুন...",
+        breakfastHeading: "1. ব্রেকফাস্ট রেসিপি",
+        lunchHeading: "2. লাঞ্চ রেসিপি",
+        dinnerHeading: "3. ডিনার রেসিপি",
+        filterAll: "সব 🍽️",
+        filterVeg: "নিরামিষ 🥦",
+        filterNonVeg: "নন-ভেজ 🍖",
+        filterChicken: "চিকেন 🍗",
+        filterMutton: "মাটন 🍖",
+        filterFastFood: "ফাস্ট ফুড 🍔",
+        filterJunkFood: "জাঙ্ক ফুড 🍟",
+        filterColdDrink: "কোল্ড ড্রিঙ্কস 🥤",
+        filterBreakfast: "ব্রেকফাস্ট 🍳",
+        filterLunch: "লাঞ্চ 🍛",
+        filterDinner: "ডিনার 🍽️",
+        filterDessert: "ডেজার্ট 🍰",
+        filterSnack: "স্ন্যাকস 🌮",
+        back: "রেসিপিতে ফিরে যান",
+        open: "খুলুন",
+        openFullRecipe: "পুরো রেসিপি খুলুন",
+        searchDish: "এই খাবারটি খুঁজুন",
+        stateWise: "ভারত রাজ্যভিত্তিক",
+        countryWise: "দেশভিত্তিক",
+        famousDishes: "{count} জনপ্রিয় খাবার",
+        famousFrom: "এখানকার জনপ্রিয় রেসিপি",
+        famousOf: "এখানকার জনপ্রিয় খাবার",
+        alreadyAvailable: "এই রেসিপিটি ইতিমধ্যেই SpiceRoute-এ আছে।",
+        famousDishIdea: "এটি একটি জনপ্রিয় খাবারের ধারণা। পরে এর পুরো উপকরণ ও ধাপ যোগ করতে পারবেন।",
+        ingredients: "উপকরণ",
+        spices: "মসলা ও সিজনিং",
+        steps: "রান্নার ধাপ",
+        statsShown: "{total}টির মধ্যে {visible}টি রেসিপি দেখা যাচ্ছে",
+        vegLabel: "নিরামিষ",
+        nonvegLabel: "নন-ভেজ",
+        chickenLabel: "চিকেন",
+        muttonLabel: "মাটন",
+        fastFoodLabel: "ফাস্ট ফুড",
+        junkFoodLabel: "জাঙ্ক ফুড",
+        coldDrinkLabel: "কোল্ড ড্রিঙ্ক",
+        breakfastLabel: "ব্রেকফাস্ট",
+        lunchLabel: "লাঞ্চ",
+        dinnerLabel: "ডিনার",
+        dessertLabel: "ডেজার্ট",
+        snackLabel: "স্ন্যাকস",
+        stepsCount: "{count} ধাপ"
+      },
+      bho: {
+        pageTitle: "स्पाइस रूट रेसिपी स्टूडियो",
+        brandShort: "स्पाइस रूट",
+        siteIntro: "सुंदर रेसिपी कार्ड, फोटो, सामग्री, मसाला आ आसान स्टेप-बाय-स्टेप कुकिंग मदद के साथ। जवन यूज़र अंग्रेजी ना बुझत होखे, ऊ अब भाषा बदल के आसानी से साइट देख सकेला।",
+        darkMode: "डार्क मोड",
+        language: "भाषा",
+        states: "भारतीय राज्य",
+        countries: "देश",
+        searchPlaceholder: "रेसिपी, देश, सामग्री खोजीं...",
+        breakfastHeading: "1. नाश्ता रेसिपी",
+        lunchHeading: "2. दुपहरिया खाना रेसिपी",
+        dinnerHeading: "3. रात के खाना रेसिपी",
+        filterAll: "सब 🍽️",
+        filterVeg: "साकाहारी 🥦",
+        filterNonVeg: "नॉन-वेज 🍖",
+        filterChicken: "चिकन 🍗",
+        filterMutton: "मटन 🍖",
+        filterFastFood: "फास्ट फूड 🍔",
+        filterJunkFood: "जंक फूड 🍟",
+        filterColdDrink: "कोल्ड ड्रिंक्स 🥤",
+        filterBreakfast: "नाश्ता 🍳",
+        filterLunch: "लंच 🍛",
+        filterDinner: "डिनर 🍽️",
+        filterDessert: "मीठा 🍰",
+        filterSnack: "नास्ता 🌮",
+        back: "रेसिपी पर लवटीं",
+        open: "खोलीं",
+        openFullRecipe: "पूरा रेसिपी खोलीं",
+        searchDish: "ई डिश खोजीं",
+        stateWise: "भारत राज्य अनुसार",
+        countryWise: "देश अनुसार",
+        famousDishes: "{count} मशहूर पकवान",
+        famousFrom: "एह जगह के मशहूर रेसिपी",
+        famousOf: "एह जगह के मशहूर पकवान",
+        alreadyAvailable: "ई रेसिपी पहिले से SpiceRoute में बा।",
+        famousDishIdea: "ई एक मशहूर डिश के आइडिया बा। बाद में रउआ एकर पूरा सामग्री आ स्टेप्स जोड़ सकतानी।",
+        ingredients: "सामग्री",
+        spices: "मसाला आ सीजनिंग",
+        steps: "बनावे के तरीका",
+        statsShown: "{total} में से {visible} रेसिपी देखावल जा रहल बा",
+        vegLabel: "साकाहारी",
+        nonvegLabel: "नॉन-वेज",
+        chickenLabel: "चिकन",
+        muttonLabel: "मटन",
+        fastFoodLabel: "फास्ट फूड",
+        junkFoodLabel: "जंक फूड",
+        coldDrinkLabel: "कोल्ड ड्रिंक",
+        breakfastLabel: "नाश्ता",
+        lunchLabel: "लंच",
+        dinnerLabel: "डिनर",
+        dessertLabel: "मीठा",
+        snackLabel: "नास्ता",
+        stepsCount: "{count} स्टेप"
+      }
+    };
+
+    let currentLanguage = "en";
+    let currentFilter = "all";
+    let activeDetailView = null;
+    let filtersExpanded = false;
+    let authMode = "login";
+    let currentUser = null;
+    function resolveApiBaseUrl() {
+      if (window.location.protocol === "file:") {
+        return "http://127.0.0.1:8000/api";
+      }
+
+      return `${window.location.origin}/api`;
+    }
+
+    const API_BASE_URL = resolveApiBaseUrl();
+
+    function t(key, replacements = {}) {
+      const dictionary = translations[currentLanguage] || translations.en;
+      const template = dictionary[key] || translations.en[key] || key;
+
+      return Object.entries(replacements).reduce((message, [token, value]) => {
+        return message.replace(new RegExp(`\\{${token}\\}`, "g"), value);
+      }, template);
+    }
+
+    function te(key, fallback, replacements = {}) {
+      const dictionary = translations[currentLanguage] || {};
+      const english = translations.en || {};
+      const template = dictionary[key] || english[key] || fallback;
+
+      return Object.entries(replacements).reduce((message, [token, value]) => {
+        return message.replace(new RegExp(`\\{${token}\\}`, "g"), value);
+      }, template);
+    }
+
+    const backendApi = {
+      async request(path, options = {}) {
+        let response;
+
+        try {
+          response = await fetch(`${API_BASE_URL}${path}`, {
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              ...(options.headers || {})
+            },
+            ...options
+          });
+        } catch (error) {
+          const backendHint = window.location.protocol === "file:"
+            ? "Open the site with `http://127.0.0.1:8000/` after starting `server.py`."
+            : "Make sure the backend server is running and reachable.";
+          throw new Error(`Cannot connect to the server. ${backendHint}`);
+        }
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.error || "Request failed.");
+        }
+
+        return data;
+      },
+
+      async signup(payload) {
+        return this.request("/signup", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+      },
+
+      async login(payload) {
+        return this.request("/login", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+      },
+
+      async getSession() {
+        try {
+          return await this.request("/session");
+        } catch (error) {
+          return JSON.parse(localStorage.getItem("spiceroute-session") || "null");
+        }
+      },
+
+      async logout() {
+        try {
+          await this.request("/logout", { method: "POST" });
+        } catch (error) {
+          // Keep the UI responsive even if the server is temporarily unavailable.
+        }
+
+        localStorage.removeItem("spiceroute-session");
+      }
+    };
+
+    const lunchRecipeNames = [
+      "Dal Tadka",
+      "Veg Fried Rice",
+      "Chicken Curry",
+      "Mutton Curry",
+      "Fish Fry",
+      "Pizza Margherita",
+      "Tacos",
+      "Greek Salad",
+      "Ratatouille",
+      "Jollof Rice",
+      "Chole Masala",
+      "Rajma Masala",
+      "Aloo Gobi",
+      "Palak Paneer",
+      "Baingan Bharta",
+      "Sambar",
+      "Vegetable Pulao",
+      "Keema Matar",
+      "Prawn Masala",
+      "Mushroom Masala",
+      "Butter Chicken"
+    ];
+
+    function getMealGroup(recipe) {
+      if (recipe.meal === "breakfast") {
+        return "breakfast";
+      }
+
+      if (lunchRecipeNames.includes(recipe.name)) {
+        return "lunch";
+      }
+
+      return "dinner";
+    }
+
+    function getRecipeClasses(recipe) {
+      return [
+        recipe.type,
+        recipe.meal,
+        getMealGroup(recipe),
+        recipe.category,
+        recipe.protein
+      ].filter(Boolean).join(" ");
+    }
+
+    function getRecipeTitle(recipe) {
+      return `${recipe.emoji ? `${recipe.emoji} ` : ""}${recipe.name}`;
+    }
+
+    function getTypeLabel(recipe) {
+      if (recipe.protein === "chicken") {
+        return t("chickenLabel");
+      }
+
+      if (recipe.protein === "mutton") {
+        return t("muttonLabel");
+      }
+
+      return recipe.type === "veg" ? t("vegLabel") : t("nonvegLabel");
+    }
+
+    function getCategoryLabel(recipe) {
+      const labels = {
+        fastfood: t("fastFoodLabel"),
+        junkfood: t("junkFoodLabel"),
+        colddrink: t("coldDrinkLabel")
+      };
+
+      return labels[recipe.category] || "";
+    }
+
+    function getMealLabel(meal) {
+      const labels = {
+        breakfast: t("breakfastLabel"),
+        lunch: t("lunchLabel"),
+        dinner: t("dinnerLabel"),
+        dessert: t("dessertLabel"),
+        snack: t("snackLabel")
+      };
+
+      return labels[meal] || meal;
+    }
+
+    function refreshStaticText() {
+      document.documentElement.lang = currentLanguage;
+      document.title = t("pageTitle");
+      document.getElementById("siteTitle").textContent = t("pageTitle");
+      document.getElementById("siteIntro").textContent = t("siteIntro");
+      document.getElementById("welcomeTitle").textContent = t("pageTitle");
+      document.getElementById("welcomeText").textContent = te("welcomeText", "Fresh flavors, smart search, and easy recipe browsing for every screen.");
+      document.getElementById("welcomeButton").textContent = te("enterSite", "Enter SpiceRoute");
+      document.getElementById("darkToggle").textContent = t("darkMode");
+      document.getElementById("languageLabel").textContent = t("language");
+      document.getElementById("stateSummary").textContent = t("states");
+      document.getElementById("countrySummary").textContent = t("countries");
+      document.getElementById("search").placeholder = t("searchPlaceholder");
+      document.getElementById("breakfastHeading").textContent = t("breakfastHeading");
+      document.getElementById("lunchHeading").textContent = t("lunchHeading");
+      document.getElementById("dinnerHeading").textContent = t("dinnerHeading");
+
+      const filterText = {
+        "filter-all": t("filterAll"),
+        "filter-veg": t("filterVeg"),
+        "filter-nonveg": t("filterNonVeg"),
+        "filter-chicken": t("filterChicken"),
+        "filter-mutton": t("filterMutton"),
+        "filter-fastfood": t("filterFastFood"),
+        "filter-junkfood": t("filterJunkFood"),
+        "filter-colddrink": t("filterColdDrink"),
+        "filter-breakfast": t("filterBreakfast"),
+        "filter-lunch": t("filterLunch"),
+        "filter-dinner": t("filterDinner"),
+        "filter-dessert": t("filterDessert"),
+        "filter-snack": t("filterSnack")
+      };
+
+      Object.entries(filterText).forEach(([id, text]) => {
+        const node = document.getElementById(id);
+        if (node) {
+          node.textContent = text;
+        }
+      });
+
+      const moreButton = document.getElementById("moreFiltersButton");
+      if (moreButton) {
+        moreButton.textContent = filtersExpanded ? te("lessFilters", "Less Filters") : te("moreFilters", "More Filters");
+      }
+
+      document.getElementById("authHeading").textContent = te("authHeading", "Join SpiceRoute");
+      document.getElementById("authIntro").textContent = te("authIntro", "Create an account or log in to keep your session ready on this device.");
+      document.getElementById("loginTab").textContent = te("loginButton", "Login");
+      document.getElementById("signupTab").textContent = te("signupButton", "Signup");
+      document.getElementById("authNameLabel").textContent = te("nameLabel", "Full Name");
+      document.getElementById("authEmailLabel").textContent = te("emailLabel", "Email");
+      document.getElementById("authPasswordLabel").textContent = te("passwordLabel", "Password");
+      document.getElementById("authName").placeholder = te("namePlaceholder", "Enter your name");
+      document.getElementById("authEmail").placeholder = te("emailPlaceholder", "Enter your email");
+      document.getElementById("authPassword").placeholder = authMode === "signup"
+        ? te("passwordCreate", "Create password")
+        : te("passwordEnter", "Enter password");
+      document.getElementById("authSubmit").textContent = authMode === "signup"
+        ? te("signupButton", "Signup")
+        : te("loginButton", "Login");
+      document.getElementById("authCloseButton").textContent = te("closeButton", "Close");
+      document.getElementById("authOpenButton").textContent = te("authOpen", "Login / Signup");
+      document.getElementById("logoutButton").textContent = te("logoutButton", "Logout");
+    }
+
+    function closeQuickBoxes() {
+      document.querySelectorAll(".quick-box").forEach(box => {
+        box.open = false;
+      });
+    }
+
+    function enhanceControlsLayout() {
+      const controls = document.querySelector(".controls");
+      const searchInput = document.getElementById("search");
+
+      if (!controls || !searchInput || controls.dataset.enhanced === "true") {
+        return;
+      }
+
+      const chips = Array.from(controls.querySelectorAll(".chip"));
+      const searchShell = document.createElement("div");
+      const searchWrap = document.createElement("div");
+      const icon = document.createElement("span");
+      const clearButton = document.createElement("button");
+      const filtersBar = document.createElement("div");
+      const moreButton = document.createElement("button");
+
+      searchShell.className = "search-shell";
+      searchWrap.className = "search-wrap";
+      icon.className = "search-icon";
+      icon.innerHTML = "&#128269;";
+      clearButton.className = "search-clear";
+      clearButton.type = "button";
+      clearButton.innerHTML = "&#10005;";
+      clearButton.setAttribute("aria-label", "Clear search");
+      clearButton.onclick = () => {
+        searchInput.value = "";
+        syncSearchControls();
+        searchRecipe();
+        searchInput.focus();
+      };
+      filtersBar.className = "filters-bar";
+      filtersBar.id = "filtersBar";
+
+      moreButton.className = "chip more-toggle";
+      moreButton.id = "moreFiltersButton";
+      moreButton.type = "button";
+      moreButton.onclick = toggleFilters;
+
+      searchInput.parentElement?.removeChild(searchInput);
+      searchInput.removeAttribute("onkeyup");
+      searchInput.addEventListener("input", () => {
+        syncSearchControls();
+        searchRecipe();
+      });
+
+      searchWrap.append(icon, searchInput, clearButton);
+      searchShell.appendChild(searchWrap);
+      controls.prepend(searchShell);
+
+      chips.forEach((chip, index) => {
+        if (index > 1) {
+          chip.classList.add("extra-filter", "is-collapsed");
+        }
+
+        filtersBar.appendChild(chip);
+      });
+
+      if (chips.length > 2) {
+        filtersBar.appendChild(moreButton);
+      }
+
+      controls.appendChild(filtersBar);
+      controls.dataset.enhanced = "true";
+      syncSearchControls();
+      refreshStaticText();
+    }
+
+    function syncSearchControls() {
+      const searchInput = document.getElementById("search");
+      const clearButton = document.querySelector(".search-clear");
+
+      if (!searchInput || !clearButton) {
+        return;
+      }
+
+      clearButton.classList.toggle("visible", Boolean(searchInput.value.trim()));
+    }
+
+    function toggleFilters() {
+      filtersExpanded = !filtersExpanded;
+
+      document.querySelectorAll(".extra-filter").forEach(chip => {
+        chip.classList.toggle("is-collapsed", !filtersExpanded);
+      });
+
+      const moreButton = document.getElementById("moreFiltersButton");
+      if (moreButton) {
+        moreButton.classList.toggle("active", filtersExpanded);
+        moreButton.textContent = filtersExpanded ? te("lessFilters", "Less Filters") : te("moreFilters", "More Filters");
+      }
+    }
+
+    function showAuthMessage(message, isError = false) {
+      const node = document.getElementById("authMessage");
+      node.textContent = message;
+      node.classList.toggle("error", isError);
+    }
+
+    function switchAuthMode(mode) {
+      authMode = mode;
+      document.getElementById("loginTab").classList.toggle("active", mode === "login");
+      document.getElementById("signupTab").classList.toggle("active", mode === "signup");
+      document.getElementById("authName").parentElement.classList.toggle("hidden", mode === "login");
+      document.getElementById("authPassword").setAttribute("autocomplete", mode === "signup" ? "new-password" : "current-password");
+      document.getElementById("authSubmit").textContent = mode === "signup"
+        ? te("signupButton", "Signup")
+        : te("loginButton", "Login");
+      document.getElementById("authPassword").placeholder = mode === "signup"
+        ? te("passwordCreate", "Create password")
+        : te("passwordEnter", "Enter password");
+      showAuthMessage("");
+    }
+
+    function openAuthModal() {
+      document.getElementById("authModal").classList.remove("hidden");
+      switchAuthMode(authMode);
+      const targetField = authMode === "signup" ? document.getElementById("authName") : document.getElementById("authEmail");
+      targetField.focus();
+    }
+
+    function closeAuthModal() {
+      document.getElementById("authModal").classList.add("hidden");
+      showAuthMessage("");
+    }
+
+    function hideWelcomeOverlay() {
+      document.getElementById("welcomeOverlay").classList.add("hidden");
+    }
+
+    function updateAuthUI() {
+      const greeting = document.getElementById("userGreeting");
+      const status = document.getElementById("userStatus");
+      const openButton = document.getElementById("authOpenButton");
+      const logoutButton = document.getElementById("logoutButton");
+
+      if (currentUser) {
+        greeting.textContent = `${te("helloUser", "Hello")}, ${currentUser.name}`;
+        status.textContent = te("loggedInState", "Signed in on this device.");
+        openButton.classList.add("hidden");
+        logoutButton.classList.remove("hidden");
+      } else {
+        greeting.textContent = te("guestUser", "Guest User");
+        status.textContent = te("guestState", "Login to save your session on this device.");
+        openButton.classList.remove("hidden");
+        logoutButton.classList.add("hidden");
+      }
+    }
+
+    async function submitAuth(event) {
+      event.preventDefault();
+
+      const name = document.getElementById("authName").value.trim();
+      const email = document.getElementById("authEmail").value.trim();
+      const password = document.getElementById("authPassword").value;
+
+      try {
+        if (!email) {
+          throw new Error("Please enter your email.");
+        }
+
+        if (!password) {
+          throw new Error("Please enter your password.");
+        }
+
+        if (authMode === "signup") {
+          if (!name) {
+            throw new Error("Please enter your full name.");
+          }
+
+          currentUser = await backendApi.signup({ name, email, password });
+          localStorage.setItem("spiceroute-session", JSON.stringify(currentUser));
+          showAuthMessage(te("signupSuccess", "Account created successfully."));
+        } else {
+          currentUser = await backendApi.login({ email, password });
+          localStorage.setItem("spiceroute-session", JSON.stringify(currentUser));
+          showAuthMessage(te("loginSuccess", "Login successful."));
+        }
+
+        updateAuthUI();
+        document.getElementById("authForm").reset();
+        setTimeout(() => closeAuthModal(), 500);
+      } catch (error) {
+        showAuthMessage(error.message || te("authFailed", "Unable to complete this request."), true);
+      }
+    }
+
+    async function logoutUser() {
+      await backendApi.logout();
+      currentUser = null;
+      updateAuthUI();
+    }
+
+    const clickLocks = {};
+
+    function ignoreFastDoubleClick(actionName, delay = 450) {
+      const now = Date.now();
+
+      if (clickLocks[actionName] && now - clickLocks[actionName] < delay) {
+        return true;
+      }
+
+      clickLocks[actionName] = now;
+      return false;
+    }
+
+    function renderQuickCollections() {
+      const stateList = document.getElementById("stateList");
+      const countryList = document.getElementById("countryList");
+
+      stateList.innerHTML = indianStateCollections.map((item, index) => `
+        <button class="quick-item" onclick="openCollection('state', ${index})">${item.title}</button>
+      `).join("");
+
+      countryList.innerHTML = countryCollections.map((item, index) => `
+        <button class="quick-item" onclick="openCollection('country', ${index})">${item.title}</button>
+      `).join("");
+
+      document.querySelectorAll(".quick-box").forEach(box => {
+        if (box.dataset.listenerAttached === "true") {
+          return;
+        }
+
+        box.dataset.listenerAttached = "true";
+        box.addEventListener("toggle", () => {
+          if (box.open) {
+            document.querySelectorAll(".quick-box").forEach(otherBox => {
+              if (otherBox !== box) {
+                otherBox.open = false;
+              }
+            });
+          }
+        });
+      });
+    }
+
+    function renderMealLists() {
+      const groups = {
+        breakfast: [],
+        lunch: [],
+        dinner: []
+      };
+
+      recipes.forEach((recipe, index) => {
+        groups[getMealGroup(recipe)].push({ recipe, index });
+      });
+
+      ["breakfast", "lunch", "dinner"].forEach(group => {
+        const list = document.getElementById(`${group}List`);
+
+        list.innerHTML = groups[group].map(item => `
+          <button class="meal-link ${group}" onclick="openRecipePage(${item.index})">${getRecipeTitle(item.recipe)}</button>
+        `).join("");
+      });
+    }
+
+    function openCollection(type, index, skipLock = false) {
+      if (!skipLock && ignoreFastDoubleClick(`collection-${type}-${index}`)) {
+        return;
+      }
+
+      activeDetailView = { type, index };
+      closeQuickBoxes();
+
+      const collection = type === "state" ? indianStateCollections[index] : countryCollections[index];
+      const label = type === "state" ? t("famousFrom") : t("famousOf");
+      const detailPage = document.getElementById("detailPage");
+
+      detailPage.innerHTML = `
+        <button class="back-btn" onclick="closeRecipePage()">${t("back")}</button>
+        <section class="detail-hero">
+          <img src="https://source.unsplash.com/900x650/?${encodeURIComponent(collection.title)},food" alt="${collection.title}" onerror="showImageFallback(this)">
+          <div class="detail-intro">
+            <h2>${label} ${collection.title}</h2>
+            <p class="summary">${collection.subtitle}</p>
+            <div class="meta">
+              <span class="badge">${type === "state" ? t("stateWise") : t("countryWise")}</span>
+              <span class="badge">${t("famousDishes", { count: collection.dishes.length })}</span>
+            </div>
+          </div>
+        </section>
+        <section class="detail-grid">
+          ${collection.dishes.map(dish => {
+            const recipeIndex = recipes.findIndex(recipe => recipe.name.toLowerCase() === dish.toLowerCase());
+            const button = recipeIndex >= 0
+              ? `<button class="view-btn" onclick="openRecipePage(${recipeIndex})">${t("openFullRecipe")}</button>`
+              : `<button class="view-btn" onclick="searchDish('${dish.replace(/'/g, "\\'")}')">${t("searchDish")}</button>`;
+
+            return `
+              <article class="collection-card">
+                <h3>${dish}</h3>
+                <p>${recipeIndex >= 0 ? t("alreadyAvailable") : t("famousDishIdea")}</p>
+                ${button}
+              </article>
+            `;
+          }).join("")}
+        </section>
+      `;
+
+      showDetailPage();
+    }
+
+    function searchDish(dish) {
+      if (ignoreFastDoubleClick(`search-${dish}`)) {
+        return;
+      }
+
+      closeRecipePage();
+      document.getElementById("search").value = dish;
+      syncSearchControls();
+      updateRecipes();
+      scrollToRecipeResults();
+    }
+
+    function showDetailPage() {
+      document.body.classList.add("detail-open");
+      document.getElementById("topTools").classList.add("hidden");
+      document.querySelector(".dark-toggle").classList.add("hidden");
+      document.querySelector(".controls").classList.add("hidden");
+      document.getElementById("quickCorner").classList.add("hidden");
+      document.getElementById("mealLists").classList.add("hidden");
+      document.getElementById("stats").classList.add("hidden");
+      document.getElementById("recipes").classList.add("hidden");
+      document.getElementById("detailPage").classList.add("active");
+      closeQuickBoxes();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderRecipes() {
+      const container = document.getElementById("recipes");
+
+      container.innerHTML = recipes.map((recipe, index) => `
+        <article class="recipe reveal-ready ${getRecipeClasses(recipe)}" data-recipe-index="${index}" style="animation-delay: ${Math.min(index * 0.025, 0.45)}s" onclick="openRecipePage(${index})">
+          <div class="img-box">
+            <img src="${recipe.image}" alt="${getRecipeTitle(recipe)}" title="${getRecipeTitle(recipe)}" loading="lazy" onerror="showImageFallback(this)">
+            <div class="overlay">
+              <span>${getRecipeTitle(recipe)}</span>
+              <button class="view-btn" onclick="event.stopPropagation(); openRecipePage(${index});">${t("open")}</button>
+            </div>
+          </div>
+          <div class="content">
+            <div class="title">${getRecipeTitle(recipe)}</div>
+            <p class="summary">${recipe.summary}</p>
+            <div class="meta">
+              <span class="badge">${recipe.country}</span>
+              <span class="badge">${getTypeLabel(recipe)}</span>
+              ${getCategoryLabel(recipe) ? `<span class="badge">${getCategoryLabel(recipe)}</span>` : ""}
+              <span class="badge">${getMealLabel(recipe.meal)}</span>
+              <span class="badge">${t("stepsCount", { count: recipe.steps.length })}</span>
+            </div>
+          </div>
+        </article>
+      `).join("");
+
+      updateRecipes();
+      setupScrollReveal();
+    }
+
+    function buildSearchableText(recipe) {
+      return [
+        recipe.name,
+        recipe.emoji || "",
+        recipe.country,
+        recipe.type,
+        recipe.protein || "",
+        recipe.category || "",
+        recipe.meal,
+        recipe.summary,
+        recipe.ingredients.join(" "),
+        recipe.spices.join(" "),
+        recipe.steps.join(" ")
+      ].join(" ").toLowerCase();
+    }
+
+    function getSearchScore(recipe, searchText) {
+      if (!searchText) {
+        return 0;
+      }
+
+      const query = searchText.trim().toLowerCase();
+      const title = recipe.name.toLowerCase();
+      const country = recipe.country.toLowerCase();
+      const summary = recipe.summary.toLowerCase();
+      const ingredients = recipe.ingredients.join(" ").toLowerCase();
+      const spices = recipe.spices.join(" ").toLowerCase();
+      const steps = recipe.steps.join(" ").toLowerCase();
+      let score = 0;
+
+      if (title === query) {
+        score += 200;
+      }
+
+      if (title.startsWith(query)) {
+        score += 120;
+      }
+
+      if (title.includes(query)) {
+        score += 90;
+      }
+
+      if (country.includes(query)) {
+        score += 55;
+      }
+
+      if (ingredients.includes(query)) {
+        score += 45;
+      }
+
+      if (spices.includes(query)) {
+        score += 30;
+      }
+
+      if (summary.includes(query)) {
+        score += 24;
+      }
+
+      if (steps.includes(query)) {
+        score += 12;
+      }
+
+      return score;
+    }
+
+    function setupScrollReveal() {
+      const cards = document.querySelectorAll(".reveal-ready");
+
+      if (!("IntersectionObserver" in window)) {
+        cards.forEach(card => card.classList.add("revealed"));
+        return;
+      }
+
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      cards.forEach(card => observer.observe(card));
+    }
+
+    function openRecipePage(index, skipLock = false) {
+      if (!skipLock && ignoreFastDoubleClick(`recipe-${index}`)) {
+        return;
+      }
+
+      activeDetailView = { type: "recipe", index };
+      const recipe = recipes[index];
+      const detailPage = document.getElementById("detailPage");
+
+      detailPage.innerHTML = `
+        <button class="back-btn" onclick="closeRecipePage()">${t("back")}</button>
+        <section class="detail-hero">
+          <img src="${recipe.image}" alt="${getRecipeTitle(recipe)}" title="${getRecipeTitle(recipe)}" onerror="showImageFallback(this)">
+          <div class="detail-intro">
+            <h2>${getRecipeTitle(recipe)}</h2>
+            <p class="summary">${recipe.summary}</p>
+            <div class="meta">
+              <span class="badge">${recipe.country}</span>
+              <span class="badge">${getTypeLabel(recipe)}</span>
+              ${getCategoryLabel(recipe) ? `<span class="badge">${getCategoryLabel(recipe)}</span>` : ""}
+              <span class="badge">${getMealLabel(recipe.meal)}</span>
+              <span class="badge">${t("stepsCount", { count: recipe.steps.length })}</span>
+            </div>
+          </div>
+        </section>
+        <section class="detail-grid">
+          <article class="detail-card">
+            <h3>&#129530; ${t("ingredients")}</h3>
+            <ul>${recipe.ingredients.map(item => `<li>${item}</li>`).join("")}</ul>
+          </article>
+          <article class="detail-card">
+            <h3>&#129474; ${t("spices")}</h3>
+            <ul>${recipe.spices.map(item => `<li>${item}</li>`).join("")}</ul>
+          </article>
+          <article class="detail-card">
+            <h3>&#128104;&#8205;&#127859; ${t("steps")}</h3>
+            <ol>${recipe.steps.slice(0, 15).map(step => `<li>${step}</li>`).join("")}</ol>
+          </article>
+        </section>
+      `;
+
+      showDetailPage();
+    }
+
+    function closeRecipePage() {
+      if (ignoreFastDoubleClick("close-recipe")) {
+        return;
+      }
+
+      activeDetailView = null;
+      document.body.classList.remove("detail-open");
+      document.getElementById("topTools").classList.remove("hidden");
+      document.querySelector(".dark-toggle").classList.remove("hidden");
+      document.querySelector(".controls").classList.remove("hidden");
+      document.getElementById("quickCorner").classList.remove("hidden");
+      document.getElementById("mealLists").classList.remove("hidden");
+      document.getElementById("stats").classList.remove("hidden");
+      document.getElementById("recipes").classList.remove("hidden");
+      document.getElementById("detailPage").classList.remove("active");
+      closeQuickBoxes();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showImageFallback(image) {
+      const recipeName = image.alt || "Recipe";
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+          <defs>
+            <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#ff7043"/>
+              <stop offset="1" stop-color="#263238"/>
+            </linearGradient>
+          </defs>
+          <rect width="800" height="600" fill="url(#bg)"/>
+          <circle cx="650" cy="110" r="90" fill="#ffd54f" opacity="0.9"/>
+          <rect x="115" y="150" width="570" height="300" rx="26" fill="#ffffff" opacity="0.14"/>
+          <text x="400" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="700" fill="#ffffff">${t("brandShort")}</text>
+          <text x="400" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" fill="#ffffff">${recipeName}</text>
+        </svg>
+      `;
+
+      image.onerror = null;
+      image.src = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+    }
+
+    function setFilter(btn, type) {
+      if (ignoreFastDoubleClick(`filter-${type}`)) {
+        return;
+      }
+
+      closeQuickBoxes();
+      currentFilter = type;
+
+      document.querySelectorAll(".chip").forEach(chip => {
+        chip.classList.remove("active");
+      });
+
+      btn.classList.add("active");
+      updateRecipes();
+      scrollToRecipeResults();
+    }
+
+    function searchRecipe() {
+      closeQuickBoxes();
+      syncSearchControls();
+      updateRecipes();
+      scrollToRecipeResults();
+    }
+
+    function scrollToRecipeResults() {
+      const stats = document.getElementById("stats");
+
+      if (stats) {
+        stats.scrollIntoView({ behavior: "smooth", block: "start" });
+        stats.classList.remove("pulse");
+        void stats.offsetWidth;
+        stats.classList.add("pulse");
+
+        setTimeout(() => {
+          stats.classList.remove("pulse");
+        }, 450);
+      }
+    }
+
+    function updateRecipes() {
+      const container = document.getElementById("recipes");
+      const searchText = document.getElementById("search").value.toLowerCase();
+      let visibleCount = 0;
+      const rankedCards = [];
+      const hiddenCards = [];
+
+      document.querySelectorAll(".recipe").forEach(card => {
+        const index = Number(card.dataset.recipeIndex);
+        const recipe = recipes[index];
+        const searchableText = buildSearchableText(recipe);
+        const score = getSearchScore(recipe, searchText);
+
+        const matchesFilter = currentFilter === "all" || card.classList.contains(currentFilter);
+        const matchesSearch = searchableText.includes(searchText);
+        const shouldShow = matchesFilter && matchesSearch;
+
+        card.classList.toggle("hidden", !shouldShow);
+        card.classList.remove("search-top-match");
+
+        if (shouldShow) {
+          visibleCount++;
+          rankedCards.push({ card, index, score });
+        } else {
+          hiddenCards.push({ card, index });
+        }
+      });
+
+      rankedCards.sort((left, right) => {
+        if (searchText && right.score !== left.score) {
+          return right.score - left.score;
+        }
+
+        return left.index - right.index;
+      });
+
+      hiddenCards.sort((left, right) => left.index - right.index);
+
+      rankedCards.forEach((item, position) => {
+        if (searchText && position < 3) {
+          item.card.classList.add("search-top-match");
+        }
+
+        container.appendChild(item.card);
+      });
+
+      hiddenCards.forEach(item => {
+        container.appendChild(item.card);
+      });
+
+      document.getElementById("stats").textContent = t("statsShown", { visible: visibleCount, total: recipes.length });
+    }
+
+    function changeLanguage() {
+      currentLanguage = document.getElementById("languageSelect").value;
+      refreshStaticText();
+      updateAuthUI();
+      renderQuickCollections();
+      renderMealLists();
+      renderRecipes();
+
+      if (activeDetailView) {
+        if (activeDetailView.type === "recipe") {
+          openRecipePage(activeDetailView.index, true);
+        } else {
+          openCollection(activeDetailView.type, activeDetailView.index, true);
+        }
+      }
+    }
+
+    function toggleDark() {
+      document.body.classList.toggle("dark");
+    }
+
+    async function initializeApp() {
+      document.getElementById("languageSelect").value = currentLanguage;
+      enhanceControlsLayout();
+      switchAuthMode("login");
+      currentUser = await backendApi.getSession();
+      refreshStaticText();
+      updateAuthUI();
+      renderQuickCollections();
+      renderMealLists();
+      renderRecipes();
+
+      setTimeout(() => {
+        hideWelcomeOverlay();
+      }, 2400);
+    }
+
+    document.getElementById("authModal").addEventListener("click", event => {
+      if (event.target.id === "authModal") {
+        closeAuthModal();
+      }
+    });
+
+    document.getElementById("welcomeOverlay").addEventListener("click", event => {
+      if (event.target.id === "welcomeOverlay") {
+        hideWelcomeOverlay();
+      }
+    });
+
+    initializeApp();
+  </script>
+</body>
+</html>

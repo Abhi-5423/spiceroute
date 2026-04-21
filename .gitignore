@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+spiceroute.db
+server_stdout.log
+server_stderr.log
+.DS_Store
+desktop.ini
