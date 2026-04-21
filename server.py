@@ -266,6 +266,35 @@ class SpiceRouteHandler(SimpleHTTPRequestHandler):
             self.send_json(user)
             return
 
+        if parsed.path == "/robots.txt":
+            self.send_text(
+                "\n".join(
+                    [
+                        "User-agent: *",
+                        "Allow: /",
+                        f"Sitemap: {self.get_base_url()}/sitemap.xml",
+                    ]
+                )
+                + "\n",
+                content_type="text/plain; charset=utf-8",
+            )
+            return
+
+        if parsed.path == "/sitemap.xml":
+            base_url = self.get_base_url()
+            sitemap = (
+                '<?xml version="1.0" encoding="UTF-8"?>\n'
+                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+                "  <url>\n"
+                f"    <loc>{base_url}/</loc>\n"
+                "    <changefreq>weekly</changefreq>\n"
+                "    <priority>1.0</priority>\n"
+                "  </url>\n"
+                "</urlset>\n"
+            )
+            self.send_text(sitemap, content_type="application/xml; charset=utf-8")
+            return
+
         if parsed.path in {"/", ""}:
             self.path = "/paste.html"
 
@@ -314,6 +343,36 @@ class SpiceRouteHandler(SimpleHTTPRequestHandler):
 
         self.end_headers()
         self.wfile.write(data)
+
+    def send_text(
+        self,
+        payload: str,
+        *,
+        content_type: str,
+        status: HTTPStatus = HTTPStatus.OK,
+        headers: Optional[Dict[str, str]] = None,
+    ) -> None:
+        data = payload.encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "public, max-age=300")
+
+        for key, value in (headers or {}).items():
+            self.send_header(key, value)
+
+        self.end_headers()
+        self.wfile.write(data)
+
+    def get_base_url(self) -> str:
+        forwarded_proto = self.headers.get("X-Forwarded-Proto", "").strip()
+        if forwarded_proto:
+            scheme = forwarded_proto.split(",")[0].strip()
+        else:
+            scheme = "https" if USE_HTTPS_COOKIES else "http"
+
+        host = self.headers.get("Host", f"127.0.0.1:{PORT}")
+        return f"{scheme}://{host}"
 
     def build_session_cookie(self, user: dict) -> str:
         payload = {

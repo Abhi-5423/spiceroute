@@ -49,6 +49,21 @@ This repo includes `render.yaml`, so Render can deploy it as a single Python web
    - build command: `pip install -r requirements.txt`
    - start command: `python server.py`
 
+## Search indexing
+
+After the site is live on Render, finish these steps so it can be found in search engines:
+
+1. Open your live site URL and confirm the homepage loads.
+2. Open `/robots.txt` and `/sitemap.xml` on the live site and confirm both load.
+3. In Google Search Console:
+   - add your site as a property
+   - submit your sitemap URL: `https://YOUR-LIVE-DOMAIN/sitemap.xml`
+   - request indexing for the homepage
+4. In Bing Webmaster Tools:
+   - add the same site
+   - submit the same sitemap URL
+5. Wait for indexing. Search appearance is not instant and can take days or weeks.
+
 ## Production notes
 
 - Set a strong `SESSION_SECRET`
