@@ -3969,86 +3969,201 @@
       return ["#c75b2c", "#8f3411", recipe.emoji || "🍲"];
     }
 
+    function pickRecipeImageFromPool(name, pool) {
+      if (!pool.length) {
+        return "";
+      }
+
+      const hash = [...name].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      return pool[hash % pool.length];
+    }
+
     function getFallbackRecipeImage(recipe) {
       const name = recipe.name.toLowerCase();
 
       if (recipe.category === "drink") {
-        if (/(lassi|buttermilk|sattu|banana|shake|juice|coconut|green tea|tea)/.test(name)) {
-          return "/assets/recipes/mango-shake.jpg";
+        if (/(banana|shake|lassi|buttermilk|juice|coconut|sattu)/.test(name)) {
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/mango-shake.jpg",
+            "/assets/recipes/cold-coffee.jpg"
+          ]);
         }
 
-        return "/assets/recipes/cold-coffee.jpg";
+        return pickRecipeImageFromPool(name, [
+          "/assets/recipes/cold-coffee.jpg",
+          "/assets/recipes/mango-shake.jpg"
+        ]);
       }
 
       if (recipe.category === "colddrink") {
         if (/(lemon|7up|sprite|limca)/.test(name)) {
-          return "/assets/recipes/lemon-soda.jpg";
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/lemon-soda.jpg",
+            "/assets/recipes/cola-float.jpg"
+          ]);
         }
 
-        return "/assets/recipes/cola-float.jpg";
+        return pickRecipeImageFromPool(name, [
+          "/assets/recipes/cola-float.jpg",
+          "/assets/recipes/lemon-soda.jpg"
+        ]);
       }
 
       if (recipe.protein === "chicken") {
-        if (/(tikka|tandoori|lollipop)/.test(name)) {
-          return "/assets/recipes/chicken-tikka.jpg";
+        if (/(tikka|tandoori|65|lollipop)/.test(name)) {
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/chicken-tikka.jpg",
+            "/assets/recipes/butter-chicken.jpg"
+          ]);
         }
 
         if (/(shawarma|roll|sandwich)/.test(name)) {
-          return "/assets/recipes/chicken-shawarma-roll.jpg";
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/chicken-shawarma-roll.jpg",
+            "/assets/recipes/chicken-tikka.jpg"
+          ]);
         }
 
-        return "/assets/recipes/chicken-curry.jpg";
+        if (/(fried rice|noodles|manchurian)/.test(name)) {
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/veg-fried-rice.jpg",
+            "/assets/recipes/chicken-curry.jpg"
+          ]);
+        }
+
+        return pickRecipeImageFromPool(name, [
+          "/assets/recipes/chicken-curry.jpg",
+          "/assets/recipes/chicken-korma.jpg",
+          "/assets/recipes/butter-chicken.jpg"
+        ]);
       }
 
       if (recipe.protein === "mutton") {
-        if (/(biryani|keema)/.test(name)) {
-          return "/assets/recipes/mutton-rogan-josh.jpg";
+        if (/(biryani)/.test(name)) {
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/mutton-rogan-josh.jpg",
+            "/assets/recipes/vegetable-pulao.jpg"
+          ]);
         }
 
-        return "/assets/recipes/mutton-curry.jpg";
+        if (/(keema|nihari)/.test(name)) {
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/keema-matar.jpg",
+            "/assets/recipes/mutton-curry.jpg"
+          ]);
+        }
+
+        return pickRecipeImageFromPool(name, [
+          "/assets/recipes/mutton-curry.jpg",
+          "/assets/recipes/mutton-rogan-josh.jpg",
+          "/assets/recipes/mutton-seekh-kebab.jpg"
+        ]);
       }
 
       if (recipe.protein === "fish") {
         if (/(tikka|grilled|fingers|cutlet|pakora|amritsari)/.test(name)) {
-          return "/assets/recipes/fish-fry.jpg";
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/fish-fry.jpg",
+            "/assets/recipes/prawn-masala.jpg"
+          ]);
         }
 
-        return "/assets/recipes/fish-curry.jpg";
+        if (/(biryani)/.test(name)) {
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/fish-curry.jpg",
+            "/assets/recipes/vegetable-pulao.jpg"
+          ]);
+        }
+
+        return pickRecipeImageFromPool(name, [
+          "/assets/recipes/fish-curry.jpg",
+          "/assets/recipes/fish-fry.jpg",
+          "/assets/recipes/prawn-masala.jpg"
+        ]);
       }
 
       if (recipe.protein === "egg") {
         if (/(omelette|boiled)/.test(name)) {
-          return "/assets/recipes/french-omelette.jpg";
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/french-omelette.jpg",
+            "/assets/recipes/egg-bhurji.jpg"
+          ]);
         }
 
-        return "/assets/recipes/egg-bhurji.jpg";
+        if (/(fried rice|noodles|roll|sandwich)/.test(name)) {
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/veg-fried-rice.jpg",
+            "/assets/recipes/egg-bhurji.jpg"
+          ]);
+        }
+
+        return pickRecipeImageFromPool(name, [
+          "/assets/recipes/egg-bhurji.jpg",
+          "/assets/recipes/french-omelette.jpg"
+        ]);
       }
 
       if (/(paneer)/.test(name)) {
-        if (/(matar|shahi)/.test(name)) {
-          return "/assets/recipes/palak-paneer.jpg";
+        if (/(matar|shahi|palak)/.test(name)) {
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/palak-paneer.jpg",
+            "/assets/recipes/paneer-butter-masala.jpg"
+          ]);
         }
 
         if (/(tikka|bhurji)/.test(name)) {
-          return "/assets/recipes/paneer-butter-masala.jpg";
+          return pickRecipeImageFromPool(name, [
+            "/assets/recipes/paneer-butter-masala.jpg",
+            "/assets/recipes/palak-paneer.jpg"
+          ]);
         }
 
-        return "/assets/recipes/paneer-butter-masala.jpg";
+        return pickRecipeImageFromPool(name, [
+          "/assets/recipes/paneer-butter-masala.jpg",
+          "/assets/recipes/palak-paneer.jpg",
+          "/assets/recipes/malai-kofta.jpg"
+        ]);
       }
 
       if (/(naan|roti|paratha|sheermal|puri|kachori)/.test(name)) {
-        return "/assets/recipes/masala-dosa.jpg";
+        return pickRecipeImageFromPool(name, [
+          "/assets/recipes/masala-dosa.jpg",
+          "/assets/recipes/pav-bhaji.jpg",
+          "/assets/recipes/idli.jpg"
+        ]);
       }
 
-      if (/(biryani|rice|chawal|fried rice|chowmein|noodles|momos|frankie|roll|pizza|sandwich)/.test(name)) {
-        return "/assets/recipes/veg-fried-rice.jpg";
+      if (/(biryani|rice|chawal|fried rice|chowmein|noodles)/.test(name)) {
+        return pickRecipeImageFromPool(name, [
+          "/assets/recipes/veg-fried-rice.jpg",
+          "/assets/recipes/vegetable-pulao.jpg",
+          "/assets/recipes/chicken-biryani.jpg"
+        ]);
       }
 
-      if (/(kofta|curry|bhindi|ghugni|litti|chole|rajma|gobi|capsicum|pakora|chaat)/.test(name)) {
-        return "/assets/recipes/aloo-gobi.jpg";
+      if (/(momos|frankie|roll|pizza|sandwich|burger)/.test(name)) {
+        return pickRecipeImageFromPool(name, [
+          "/assets/recipes/veg-burger.jpg",
+          "/assets/recipes/cheese-burst-pizza.jpg",
+          "/assets/recipes/cheese-corn-sandwich.jpg"
+        ]);
       }
 
-      return "/assets/recipes/pav-bhaji.jpg";
+      if (/(kofta|curry|bhindi|ghugni|litti|chole|rajma|gobi|capsicum|pakora|chaat|dal|sabzi)/.test(name)) {
+        return pickRecipeImageFromPool(name, [
+          "/assets/recipes/aloo-gobi.jpg",
+          "/assets/recipes/chole-masala.jpg",
+          "/assets/recipes/rajma-masala.jpg",
+          "/assets/recipes/baingan-bharta.jpg",
+          "/assets/recipes/pav-bhaji.jpg"
+        ]);
+      }
+
+      return pickRecipeImageFromPool(name, [
+        "/assets/recipes/pav-bhaji.jpg",
+        "/assets/recipes/aloo-gobi.jpg",
+        "/assets/recipes/veg-fried-rice.jpg"
+      ]);
     }
 
     function getRecipeImage(recipe) {
