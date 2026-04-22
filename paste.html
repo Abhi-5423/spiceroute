@@ -3934,6 +3934,7 @@
       "Lemon Soda",
       "Cola Float"
     ]);
+    const extraRecipePhotoNames = new Set(Object.values(extraRecipeNames).flat());
 
     const groupPhotoPaths = {
       veg: "/assets/recipes/palak-paneer.jpg",
@@ -4168,7 +4169,9 @@
 
     function getRecipeImage(recipe) {
       const [accentA, accentB, emoji] = getRecipeImageAccent(recipe);
-      const localImagePath = recipePhotoNames.has(recipe.name) ? getRecipeImagePath(recipe.name) : "";
+      const localImagePath = (recipePhotoNames.has(recipe.name) || extraRecipePhotoNames.has(recipe.name))
+        ? getRecipeImagePath(recipe.name)
+        : "";
 
       if (localImagePath) {
         return localImagePath;
