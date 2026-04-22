@@ -5141,19 +5141,6 @@
     function renderRecipeOption(item, topMatchIds) {
       return `
         <article class="recipe recipe-option ${topMatchIds.has(item.index) ? "search-top-match" : ""}">
-          <div class="img-box">
-            <img
-              src="${getRecipeImage(item.recipe)}"
-              alt="${escapeHtml(getRecipeTitle(item.recipe))}"
-              title="${escapeHtml(getRecipeTitle(item.recipe))}"
-              loading="lazy"
-              onerror="showImageFallback(this)"
-            >
-            <div class="overlay">
-              <span>${getRecipeTitle(item.recipe)}</span>
-              <button class="view-btn" type="button" onclick="openRecipePage(${item.index})">${t("open")}</button>
-            </div>
-          </div>
           <div class="content">
             <div class="title">${getRecipeTitle(item.recipe)}</div>
             <p class="summary">${item.recipe.summary}</p>
