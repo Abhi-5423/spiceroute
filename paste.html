@@ -3869,8 +3869,81 @@
       return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
     }
 
+    const recipePhotoFiles = {
+      "Paneer Butter Masala": "File:Paneer butter masala 2.jpg",
+      "Dal Tadka": "File:Dal Tadka-Delhi.jpg",
+      "Masala Dosa": "File:Masala dosa 01.jpg",
+      "Chicken Biryani": "File:Chicken biryani 02-06-2015 (India).jpg",
+      "Poha": "File:Poha.jpg",
+      "Veg Fried Rice": "File:Vegetable fried rice from Kerala.jpg",
+      "Chicken Curry": "File:Chicken Curry 9.jpg",
+      "Mutton Curry": "File:Odia Mutton Curry (Mansha Tarkari).jpg",
+      "Fish Fry": "File:Fish fry (90626).jpg",
+      "Pizza Margherita": "File:Margherita Originale.JPG",
+      "Pasta Carbonara": "File:Pasta carbonara.jpg",
+      "Sushi Rolls": "File:Kingston and Midland sushi rolls at Ikki Sushi.jpg",
+      "Ramen": "File:Ramen Bowl 2.jpg",
+      "Pad Thai": "File:Phat Thai kung Chang Khien street stall.jpg",
+      "Thai Green Curry": "File:Thai green chicken curry and roti.jpg",
+      "Tacos": "File:001 Tacos de carnitas, carne asada y al pastor.jpg",
+      "Guacamole": "File:Guacamole IMGP1271.jpg",
+      "Paella": "File:Paella de fruit de mer.jpg",
+      "Falafel": "File:Falafel 1.JPG",
+      "Hummus": "File:Homemade hummus and pita 03.jpg",
+      "Greek Salad": "File:Greek salad and Tzatziki.jpg",
+      "Beef Burger": "File:Beef Burger In Kota Kinabalu, Malaysia.jpg",
+      "Pancakes": "File:Pancakes on table 2.jpg",
+      "French Omelette": "File:FoodOmelete.jpg",
+      "Ratatouille": "File:Ratatouille.jpg",
+      "Shakshuka": "File:Shakshuka by Calliopejen1.jpg",
+      "Jollof Rice": "File:Jollof rice with vegetable.jpg",
+      "Chocolate Cake": "File:Piece of chocolate cake on a white plate decorated with chocolate sauce.jpg",
+      "Gulab Jamun": "File:Two Gulab Jamun in a plate 01.jpg",
+      "Apple Pie": "File:Apple pie, The Apple Pan (Sept. 2024).JPG",
+      "Chole Masala": "File:Chana Masala - Mohammed - Spice Of Life 2024-05-27.jpg",
+      "Rajma Masala": "File:Rajma Masala.jpg",
+      "Aloo Gobi": "File:Aloo gobi.jpg",
+      "Palak Paneer": "File:Palakpaneer Rayagada Odisha 0009.jpg",
+      "Baingan Bharta": "File:Baingan Ka Bharta.JPG",
+      "Malai Kofta": "File:Malai Kofta Curry.jpg",
+      "Sambar": "File:Indian Sambar.jpg",
+      "Idli": "File:Idli Sambar.JPG",
+      "Upma": "File:Upma South India.JPG",
+      "Pav Bhaji": "File:Pav Bhaji.jpg",
+      "Vegetable Pulao": "File:VEGETABLE PULAO ~ An Indian cuisine made from fried rice mixed with fried vegetables.jpg",
+      "Butter Chicken": "File:Chicken makhani.jpg",
+      "Chicken Tikka": "File:Chicken tikka in Araku Valley, Andhra Pradesh 01.jpg",
+      "Rogan Josh": "File:Rogan josh02.jpg",
+      "Fish Curry": "File:South Indian Fish Curry with Steamed Rice-Chennai-TamilNadu-DSC0001.jpg",
+      "Egg Bhurji": "File:Spicy egg bhurji @ the eggfactory.jpg",
+      "Keema Matar": "File:Keema Matar (a dish from India).jpg",
+      "Chicken Korma": "File:Chicken Korma.JPG",
+      "Prawn Masala": "File:Prawns Masala Recipe.jpg",
+      "Hyderabadi Haleem": "File:Haleem hyderabadi.jpg",
+      "Chicken Shawarma Roll": "File:Chicken Shawarma (94298).jpg",
+      "Mutton Rogan Josh": "File:Mutton Rogan Josh curry.jpg",
+      "Mutton Seekh Kebab": "File:Seekh Kebab.JPG",
+      "Veg Noodles": "File:Noodles with vegetable dish.jpg",
+      "Mushroom Masala": "File:Mushroom Butter Masala (15914329462).jpg",
+      "Cheese Corn Sandwich": "File:Corn cheese Sandwich.jpg",
+      "Veg Burger": "File:Italian Veg Burger.jpg",
+      "French Fries": "File:McDonald's French Fries, Canada, 2026-04-04.jpg",
+      "Cheese Burst Pizza": "File:Cheese Burst Pizza Slice.jpg",
+      "Cold Coffee": "File:Cold Coffee 2.jpg",
+      "Mango Shake": "File:Mango Milkshake.jpg",
+      "Lemon Soda": "File:Nimbu Soda Or Lemon Soda.jpg",
+      "Cola Float": "File:Cola Float.jpg"
+    };
+
     function isDeprecatedRemoteImage(url) {
       return typeof url === "string" && url.includes("source.unsplash.com");
+    }
+
+    function getCommonsImageUrl(fileTitle, width = 960) {
+      const cleanTitle = (fileTitle || "").replace(/^File:/, "");
+      return cleanTitle
+        ? `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(cleanTitle)}?width=${width}`
+        : "";
     }
 
     function getRecipeImageAccent(recipe) {
@@ -3891,6 +3964,11 @@
 
     function getRecipeImage(recipe) {
       const [accentA, accentB, emoji] = getRecipeImageAccent(recipe);
+      const mappedFile = recipePhotoFiles[recipe.name];
+
+      if (mappedFile) {
+        return getCommonsImageUrl(mappedFile);
+      }
 
       if (recipe.image && !isDeprecatedRemoteImage(recipe.image)) {
         return recipe.image;
