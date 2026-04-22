@@ -3935,12 +3935,22 @@
       "Cola Float"
     ]);
 
+    const groupPhotoPaths = {
+      veg: "/assets/recipes/palak-paneer.jpg",
+      nonveg: "/assets/recipes/chicken-curry.jpg",
+      drink: "/assets/recipes/mango-shake.jpg",
+      colddrink: "/assets/recipes/lemon-soda.jpg",
+      breakfast: "/assets/recipes/masala-dosa.jpg",
+      lunch: "/assets/recipes/pav-bhaji.jpg",
+      dinner: "/assets/recipes/butter-chicken.jpg"
+    };
+
     function isDeprecatedRemoteImage(url) {
       return typeof url === "string" && url.includes("source.unsplash.com");
     }
 
     function getRecipeImagePath(recipeName) {
-      return `assets/recipes/${recipeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.jpg`;
+      return `/assets/recipes/${recipeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.jpg`;
     }
 
     function getRecipeImageAccent(recipe) {
@@ -3975,6 +3985,10 @@
     }
 
     function getGroupCardImage(groupKey, title = "") {
+      if (groupPhotoPaths[groupKey]) {
+        return groupPhotoPaths[groupKey];
+      }
+
       const themes = {
         veg: ["#4f8f52", "#2f6f46", "🥗"],
         nonveg: ["#c75b2c", "#8f3411", "🍗"],
