@@ -85,6 +85,17 @@
       }
     }
 
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-28px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
     @keyframes softPulse {
       0%, 100% {
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
@@ -138,6 +149,7 @@
       z-index: 10;
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
       gap: 8px;
       justify-content: center;
       padding: 14px 12px;
@@ -151,7 +163,7 @@
     }
 
     .controls input {
-      min-width: 240px;
+      min-width: 180px;
       max-width: 100%;
       padding: 12px 14px;
       border: 1px solid var(--border-soft);
@@ -171,11 +183,12 @@
       flex: 1 1 100%;
       display: flex;
       justify-content: center;
+      width: 100%;
     }
 
     .search-wrap {
       position: relative;
-      width: min(760px, 100%);
+      width: min(420px, 100%);
       display: flex;
       align-items: center;
     }
@@ -233,6 +246,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      align-items: center;
       justify-content: center;
     }
 
@@ -337,7 +351,7 @@
     }
 
     .meal-lists {
-      display: grid;
+      display: none;
       grid-template-columns: repeat(3, minmax(220px, 1fr));
       gap: 16px;
       padding: 18px;
@@ -440,10 +454,402 @@
 
     .container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 18px;
       padding: 18px;
       align-items: start;
+    }
+
+    .recipe-main-card {
+      align-self: start;
+      overflow: hidden;
+      border-radius: 18px;
+      background: var(--surface-strong);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: var(--shadow-soft);
+      animation: fadeSlideUp 0.45s ease both;
+    }
+
+    body.dark .recipe-main-card {
+      background: #1e1e1e;
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .recipe-main-summary {
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .recipe-main-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .recipe-main-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent-deep), var(--accent));
+    }
+
+    .recipe-main-card.nonveg-group .recipe-main-head {
+      background: linear-gradient(135deg, #7a1d1d, #c84a2d);
+    }
+
+    .recipe-main-card.veg-group .recipe-main-head {
+      background: linear-gradient(135deg, #2d5f43, #5d9b5d);
+    }
+
+    .recipe-main-card.drink-group .recipe-main-head {
+      background: linear-gradient(135deg, #006c67, #20a39e);
+    }
+
+    .recipe-main-card.colddrink-group .recipe-main-head {
+      background: linear-gradient(135deg, #22577a, #38a3a5);
+    }
+
+    .recipe-main-card.empty-state .recipe-main-head {
+      background: linear-gradient(135deg, #5f534d, #8b7a72);
+    }
+
+    .recipe-main-card.breakfast-group .recipe-main-head {
+      background: linear-gradient(135deg, #915c16, #d59c2b);
+    }
+
+    .recipe-main-card.lunch-group .recipe-main-head {
+      background: linear-gradient(135deg, #28643b, #5aa469);
+    }
+
+    .recipe-main-card.dinner-group .recipe-main-head {
+      background: linear-gradient(135deg, #2f4f82, #5a81d8);
+    }
+
+    .recipe-main-copy {
+      display: grid;
+      gap: 6px;
+      flex: 1 1 auto;
+    }
+
+    .recipe-main-head h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .recipe-main-head p {
+      margin: 6px 0 0;
+      color: rgba(255, 255, 255, 0.88);
+      line-height: 1.4;
+      font-size: 14px;
+    }
+
+    .card-summary-meta {
+      display: grid;
+      gap: 8px;
+      justify-items: end;
+    }
+
+    .card-summary-meta .card-total {
+      margin-top: 0;
+    }
+
+    .card-total {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .card-chevron {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.16);
+      font-size: 18px;
+      font-weight: 700;
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .recipe-main-card[open] .card-chevron {
+      transform: rotate(180deg);
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .recipe-main-body {
+      display: grid;
+      gap: 0;
+    }
+
+    .recipe-section {
+      padding: 14px 14px 4px;
+      border-top: 1px solid rgba(199, 91, 44, 0.12);
+    }
+
+    .recipe-section h3 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 10px;
+      color: var(--accent-deep);
+      font-size: 17px;
+    }
+
+    body.dark .recipe-section h3 {
+      color: #ffb28d;
+    }
+
+    .section-total {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(199, 91, 44, 0.08);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    body.dark .section-total {
+      background: rgba(255, 255, 255, 0.1);
+      color: #dfcfc6;
+    }
+
+    .recipe-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      padding-bottom: 12px;
+      align-items: start;
+    }
+
+    .recipe-option {
+      width: 100%;
+      min-height: 100%;
+    }
+
+    .recipe-card-footer {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .recipe-option .content {
+      display: grid;
+      align-content: start;
+    }
+
+    .recipe-option .title {
+      margin-bottom: 8px;
+    }
+
+    .recipe-option .summary {
+      min-height: 42px;
+    }
+
+    .recipe-option .meta {
+      margin-bottom: 0;
+    }
+
+    .recipe-card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .recipe-rating-box {
+      display: grid;
+      gap: 6px;
+    }
+
+    .recipe-rating-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    body.dark .recipe-rating-label {
+      color: #dfcfc6;
+    }
+
+    .recipe-rating {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-wrap: wrap;
+    }
+
+    .rating-star {
+      width: 26px;
+      height: 26px;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+      background: rgba(199, 91, 44, 0.08);
+      color: #b8a39b;
+      font-size: 15px;
+      line-height: 1;
+      transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+    }
+
+    .rating-star:hover {
+      transform: translateY(-1px);
+      background: rgba(199, 91, 44, 0.16);
+      color: #ff9d66;
+    }
+
+    .rating-star.is-filled {
+      background: rgba(255, 191, 73, 0.18);
+      color: #ff9f1c;
+    }
+
+    body.dark .rating-star {
+      background: rgba(255, 255, 255, 0.08);
+      color: #8d827d;
+    }
+
+    body.dark .rating-star.is-filled {
+      background: rgba(255, 191, 73, 0.18);
+      color: #ffca6b;
+    }
+
+    .rating-value {
+      margin-left: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    body.dark .rating-value {
+      color: #dfcfc6;
+    }
+
+    .recipe-open-btn {
+      padding: 8px 12px;
+      font-size: 12px;
+      box-shadow: none;
+      white-space: nowrap;
+    }
+
+    .group-hint {
+      margin: 0;
+      padding: 0 16px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    body.dark .group-hint {
+      color: #dfcfc6;
+    }
+
+    .group-launch {
+      display: block;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .recipe-main-card.group-launch-card {
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .recipe-main-card.group-launch-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 38px rgba(120, 61, 29, 0.18);
+    }
+
+    .group-launch-visual {
+      position: relative;
+      min-height: 190px;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(255, 211, 189, 0.9), rgba(255, 244, 232, 0.94));
+    }
+
+    body.dark .group-launch-visual {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+    }
+
+    .group-launch-visual img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .group-launch-card:hover .group-launch-visual img {
+      transform: scale(1.04);
+    }
+
+    .group-launch-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      padding: 16px;
+      background: linear-gradient(to top, rgba(31, 21, 16, 0.72), rgba(31, 21, 16, 0.08));
+    }
+
+    .group-launch-overlay .card-total {
+      margin-top: 0;
+    }
+
+    .group-launch-body {
+      display: grid;
+    }
+
+    .recipe-main-card.search-results-card {
+      grid-column: 1 / -1;
+    }
+
+    .profile-note {
+      margin: 0 0 16px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    body.dark .profile-note {
+      color: #dfcfc6;
+    }
+
+    .readonly-input {
+      opacity: 0.78;
+      cursor: not-allowed;
+    }
+
+    .results-empty {
+      display: grid;
+      gap: 8px;
+      padding: 18px 16px 20px;
+    }
+
+    .results-empty p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    body.dark .results-empty p {
+      color: #dfcfc6;
     }
 
     .recipe {
@@ -645,6 +1051,10 @@
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 18px;
       align-items: start;
+    }
+
+    .group-detail-grid {
+      grid-template-columns: 1fr;
     }
 
     .detail-card {
@@ -884,6 +1294,28 @@
       align-items: center;
     }
 
+    .btn-inline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+
+    .btn-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
     .auth-message {
       min-height: 24px;
       margin-top: 14px;
@@ -902,6 +1334,7 @@
       border-radius: 18px;
       background: rgba(255, 255, 255, 0.78);
       box-shadow: 0 10px 24px rgba(102, 53, 28, 0.08);
+      justify-self: center;
     }
 
     .auth-status span {
@@ -909,16 +1342,152 @@
       font-size: 14px;
     }
 
+    .auth-status strong {
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
     body.dark .auth-status {
       background: rgba(255, 255, 255, 0.08);
     }
 
     .quick-corner {
-      display: flex;
+      display: none;
       flex-wrap: wrap;
       gap: 8px;
       justify-content: flex-end;
       width: 100%;
+    }
+
+    .menu-corner {
+      flex: 0 0 auto;
+      width: min(360px, 100%);
+      margin-right: auto;
+    }
+
+    .menu-panel {
+      position: relative;
+      width: min(360px, 100%);
+      border-radius: 16px;
+      background: var(--surface-strong);
+      box-shadow: 0 12px 30px rgba(68, 36, 22, 0.2);
+    }
+
+    body.dark .menu-panel {
+      background: #1e1e1e;
+    }
+
+    .menu-panel summary {
+      padding: 11px 14px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 800;
+      list-style: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #31231e, var(--accent));
+    }
+
+    .menu-panel summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .menu-content {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 70;
+      display: grid;
+      gap: 12px;
+      width: min(360px, calc(100vw - 28px));
+      max-height: 72vh;
+      overflow-y: auto;
+      padding: 12px;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
+      transform-origin: top left;
+      animation: slideInLeft 0.22s ease both;
+    }
+
+    body.dark .menu-content {
+      background: #1e1e1e;
+    }
+
+    .menu-block {
+      display: grid;
+      gap: 8px;
+    }
+
+    .menu-block h3 {
+      margin: 0;
+      color: var(--accent-deep);
+      font-size: 14px;
+    }
+
+    body.dark .menu-block h3 {
+      color: #ffd2bd;
+    }
+
+    .menu-grid {
+      display: grid;
+      gap: 7px;
+    }
+
+    .menu-action-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .menu-nested {
+      border-radius: 12px;
+      border: 1px solid rgba(199, 91, 44, 0.12);
+      background: rgba(255, 248, 242, 0.7);
+    }
+
+    body.dark .menu-nested {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .menu-nested summary {
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--accent-deep);
+      list-style: none;
+    }
+
+    .menu-nested summary::-webkit-details-marker {
+      display: none;
+    }
+
+    body.dark .menu-nested summary {
+      color: #ffd2bd;
+    }
+
+    .menu-nested .menu-grid {
+      padding: 0 10px 10px;
+    }
+
+    .menu-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      font: inherit;
+      background: rgba(255, 248, 242, 0.94);
+    }
+
+    body.dark .menu-select {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .rating-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
     .quick-box {
@@ -1021,7 +1590,7 @@
       flex-wrap: wrap;
       gap: 10px;
       align-items: flex-start;
-      justify-content: flex-end;
+      justify-content: space-between;
       padding: 14px 18px;
       background: rgba(255, 249, 244, 0.78);
       backdrop-filter: blur(8px);
@@ -1041,6 +1610,11 @@
 
     body.dark .top-tools {
       background: rgba(18, 18, 18, 0.72);
+    }
+
+    .toolbar-group {
+      margin-left: auto;
+      justify-content: flex-end;
     }
 
     @media (max-width: 760px) {
@@ -1095,6 +1669,10 @@
 
       .meal-lists {
         grid-template-columns: 1fr;
+      }
+
+      .recipe-option {
+        width: 100%;
       }
 
       .detail-hero {
@@ -1189,19 +1767,119 @@
       <div class="auth-message" id="authMessage" aria-live="polite"></div>
     </div>
   </div>
+
+  <div class="auth-modal hidden" id="profileModal">
+    <div class="auth-card">
+      <h2 id="profileHeading">Edit Profile</h2>
+      <p class="profile-note" id="profileIntro">Update a few user details for this device. These profile edits stay local in your browser.</p>
+      <form class="auth-form" id="profileForm" onsubmit="submitProfile(event)">
+        <label>
+          <span id="profileNameLabel">Full Name</span>
+          <input type="text" id="profileName" placeholder="Enter your full name" autocomplete="name" required>
+        </label>
+        <label>
+          <span id="profileEmailLabel">Email</span>
+          <input type="email" id="profileEmail" class="readonly-input" readonly>
+        </label>
+        <label>
+          <span id="profilePhoneLabel">Phone Number</span>
+          <input type="tel" id="profilePhone" placeholder="Optional phone number" autocomplete="tel">
+        </label>
+        <label>
+          <span id="profileCityLabel">City / State</span>
+          <input type="text" id="profileCity" placeholder="Optional city or state" autocomplete="address-level2">
+        </label>
+        <label>
+          <span id="profileCuisineLabel">Favorite Cuisine</span>
+          <input type="text" id="profileCuisine" placeholder="Optional favorite cuisine">
+        </label>
+        <div class="auth-actions">
+          <button class="top-btn" type="submit" id="profileSaveButton">Save Profile</button>
+          <button class="top-btn auth-close" type="button" id="profileCloseButton" onclick="closeProfileModal()">Close</button>
+        </div>
+      </form>
+      <div class="auth-message" id="profileMessage" aria-live="polite"></div>
+    </div>
+  </div>
   <header class="header">
     <h1 id="siteTitle">SpiceRoute Recipe Studio</h1>
     <p id="siteIntro">Beautiful recipe cards with images, ingredients, spices, and step-by-step cooking help. Switch the site language anytime to make browsing easier for more users.</p>
   </header>
 
   <div class="top-tools" id="topTools">
+    <div class="menu-corner">
+      <details class="menu-panel" id="mainMenu">
+        <summary id="menuSummary">Menu</summary>
+        <div class="menu-content">
+          <div class="menu-block">
+            <details class="menu-nested" id="menuStatePanel">
+              <summary id="menuStateHeading">State</summary>
+              <div class="menu-grid" id="menuStateList"></div>
+            </details>
+          </div>
+          <div class="menu-block">
+            <details class="menu-nested" id="menuCountryPanel">
+              <summary id="menuCountryHeading">Country</summary>
+              <div class="menu-grid" id="menuCountryList"></div>
+            </details>
+          </div>
+          <div class="menu-block">
+            <h3 id="menuLanguageHeading">Language Changer</h3>
+            <select class="menu-select" id="menuLanguageSelect" onchange="syncMenuLanguage()">
+              <option value="en">English</option>
+              <option value="hi">Hindi</option>
+              <option value="gu">Gujarati</option>
+              <option value="mr">Marathi</option>
+              <option value="te">Telugu</option>
+              <option value="bn">Bengali</option>
+              <option value="bho">Bhojpuri</option>
+            </select>
+          </div>
+          <div class="menu-block">
+            <h3 id="menuRatingHeading">Rating</h3>
+            <div class="rating-row">
+              <button class="quick-item" type="button" onclick="setSiteRating(3)">3 Star</button>
+              <button class="quick-item" type="button" onclick="setSiteRating(4)">4 Star</button>
+              <button class="quick-item" type="button" onclick="setSiteRating(5)">5 Star</button>
+            </div>
+            <span id="ratingStatus" class="summary">No rating selected.</span>
+          </div>
+          <div class="menu-block">
+            <h3 id="menuLoginHeading">Login / Signup</h3>
+            <button class="top-btn btn-inline" id="menuLoginButton" type="button" onclick="openAuthModal()">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+                </svg>
+              </span>
+              <span id="menuLoginButtonText">Login / Signup</span>
+            </button>
+          </div>
+          <div class="menu-block hidden" id="menuProfileBlock">
+            <h3 id="menuProfileHeading">Profile Options</h3>
+            <div class="menu-action-list">
+              <button class="quick-item" id="menuEditProfileButton" type="button" onclick="openProfileModal()">Edit Profile</button>
+              <button class="quick-item" id="menuLogoutButton" type="button" onclick="logoutUser()">Logout</button>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+
     <div class="auth-status">
       <strong id="userGreeting">Guest User</strong>
       <span id="userStatus">Login to save your session on this device.</span>
     </div>
 
     <div class="toolbar-group">
-      <button class="top-btn" id="authOpenButton" type="button" onclick="openAuthModal()">Login / Signup</button>
+      <button class="top-btn btn-inline" id="authOpenButton" type="button" onclick="openAuthModal()">
+        <span class="btn-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+          </svg>
+        </span>
+        <span id="authOpenButtonText">Login / Signup</span>
+      </button>
       <button class="top-btn hidden" id="logoutButton" type="button" onclick="logoutUser()">Logout</button>
       <button class="dark-toggle" id="darkToggle" type="button" onclick="toggleDark()">Dark Mode</button>
 
@@ -1239,6 +1917,9 @@
     <button class="chip" id="filter-nonveg" onclick="setFilter(this, 'nonveg')">Non-Veg 🍖</button>
     <button class="chip" id="filter-chicken" onclick="setFilter(this, 'chicken')">Chicken 🍗</button>
     <button class="chip" id="filter-mutton" onclick="setFilter(this, 'mutton')">Mutton 🍖</button>
+    <button class="chip" id="filter-fish" onclick="setFilter(this, 'fish')">Fish</button>
+    <button class="chip" id="filter-egg" onclick="setFilter(this, 'egg')">Eggs</button>
+    <button class="chip" id="filter-drink" onclick="setFilter(this, 'drink')">Healthy Drinks</button>
     <button class="chip" id="filter-fastfood" onclick="setFilter(this, 'fastfood')">Fast Food 🍔</button>
     <button class="chip" id="filter-junkfood" onclick="setFilter(this, 'junkfood')">Junk Food 🍟</button>
     <button class="chip" id="filter-colddrink" onclick="setFilter(this, 'colddrink')">Cold Drinks 🥤</button>
@@ -1984,7 +2665,7 @@
         country: "India",
         type: "veg",
         meal: "snack",
-        category: "colddrink",
+        category: "drink",
         emoji: "🧋",
         image: "https://source.unsplash.com/800x600/?cold,coffee",
         summary: "Chilled creamy coffee blended with milk and ice.",
@@ -1997,7 +2678,7 @@
         country: "India",
         type: "veg",
         meal: "snack",
-        category: "colddrink",
+        category: "drink",
         emoji: "🥭",
         image: "https://source.unsplash.com/800x600/?mango,shake",
         summary: "Sweet thick mango drink for hot summer days.",
@@ -2033,6 +2714,340 @@
       }
     ];
 
+    const extraRecipeNames = {
+      veg: [
+        "Shahi Paneer", "Kadai Paneer", "Dal Makhani", "Rajma Chawal", "Chole Bhature", "Aloo Gobi", "Aloo Paratha",
+        "Veg Biryani", "Mix Veg Curry", "Bhindi Masala", "Baingan Bharta", "Matar Paneer", "Paneer Tikka", "Veg Kofta",
+        "Malai Kofta", "Upma", "Idli", "Dosa", "Uttapam", "Veg Sandwich", "Cheese Sandwich", "Veg Momos", "Veg Chowmein",
+        "Veg Roll", "Veg Frankie", "Stuffed Capsicum", "Kadhi Pakora", "Gobi Manchurian", "Paneer Bhurji", "Tomato Soup",
+        "Sweet Corn Soup", "Lemon Rice", "Curd Rice", "Jeera Rice", "Tandoori Roti", "Butter Naan", "Garlic Naan",
+        "Veg Pizza", "Spring Rolls", "Hakka Noodles", "Litti Chokha", "Sattu Paratha", "Dal Pitha", "Kadhi Bari",
+        "Ghugni", "Chana Sattu Ladoo", "Aloo Chokha", "Sheermal", "Puri Sabzi", "Bedmi Puri", "Kachori Sabzi",
+        "Aloo Kachori", "Chaat", "Dahi Bhalla", "Papdi Chaat", "Banarasi Paan", "Agra Petha"
+      ],
+      chicken: [
+        "Chicken Fry", "Tandoori Chicken", "Chicken Do Pyaza", "Chicken Masala", "Chicken Handi", "Chicken 65",
+        "Chicken Lollipop", "Chicken Shawarma", "Chicken Roll", "Chicken Sandwich", "Chicken Soup", "Chicken Noodles",
+        "Chicken Fried Rice", "Chicken Manchurian", "Chicken Keema"
+      ],
+      mutton: [
+        "Mutton Biryani", "Mutton Korma", "Mutton Keema", "Mutton Fry", "Mutton Handi", "Mutton Soup", "Mutton Nihari",
+        "Mutton Do Pyaza", "Champaran Mutton", "Tunday Kabab", "Galouti Kabab", "Lucknowi Biryani"
+      ],
+      fish: [
+        "Fish Biryani", "Fish Tikka", "Fish Masala", "Fish Pakora", "Fish Fingers", "Grilled Fish", "Fish Amritsari",
+        "Fish Cutlet", "Bihari Fish Curry"
+      ],
+      egg: [
+        "Egg Curry", "Omelette", "Boiled Egg", "Egg Fried Rice", "Egg Noodles", "Egg Roll", "Egg Sandwich", "Egg Pakora",
+        "Masala Omelette"
+      ],
+      drink: [
+        "Lemon Juice", "Banana Shake", "Lassi (Sweet/Salted)", "Tea", "Green Tea", "Buttermilk", "Coconut Water",
+        "Fresh Juice (Orange/Apple)", "Sattu Drink (Sattu Sharbat)"
+      ],
+      colddrink: ["Coca-Cola", "Pepsi", "Sprite", "Fanta", "Thums Up", "Limca", "Mountain Dew", "7UP"]
+    };
+
+    function guessRecipeMeal(name, group) {
+      const breakfastWords = ["Poha", "Upma", "Idli", "Dosa", "Uttapam", "Paratha", "Omelette", "Boiled Egg", "Tea", "Green Tea"];
+      const snackWords = ["Tikka", "Momos", "Roll", "Frankie", "Sandwich", "Pakora", "Manchurian", "Fries", "Spring Rolls", "Lollipop", "Shawarma", "Soup", "Fingers", "Cutlet", "Juice", "Shake", "Lassi", "Coffee", "Buttermilk", "Coconut Water", "Chaat", "Kachori", "Bhalla", "Ghugni", "Kabab"];
+      const dessertWords = ["Thekua", "Khaja", "Malpua", "Tilkut", "Petha", "Jalebi", "Ladoo", "Paan"];
+
+      if (group === "drink" || group === "colddrink") {
+        return "snack";
+      }
+
+      if (breakfastWords.some(word => name.includes(word))) {
+        return "breakfast";
+      }
+
+      if (dessertWords.some(word => name.includes(word))) {
+        return "dessert";
+      }
+
+      if (snackWords.some(word => name.includes(word))) {
+        return "snack";
+      }
+
+      return "dinner";
+    }
+
+    const recipeAliases = {
+      "Baingan Bharta": ["Baigan Bharta", "Baigan Bharta (Bihari Style)"],
+      "Mutton Nihari": ["Nihari"],
+      "Lassi (Sweet/Salted)": ["Lassi"],
+      "Sattu Drink (Sattu Sharbat)": ["Sattu Sharbat"]
+    };
+
+    function normalizeLookupValue(value) {
+      return (value || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+    }
+
+    function normalizeSearchValue(value) {
+      return (value || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim()
+        .replace(/\s+/g, " ");
+    }
+
+    function buildSearchVariants(value) {
+      return {
+        raw: (value || "").trim().toLowerCase(),
+        normalized: normalizeSearchValue(value),
+        compact: normalizeLookupValue(value)
+      };
+    }
+
+    function valueEqualsSearch(targetValue, query) {
+      const target = buildSearchVariants(targetValue);
+
+      return Boolean(
+        (query.raw && target.raw === query.raw)
+        || (query.normalized && target.normalized === query.normalized)
+        || (query.compact && target.compact === query.compact)
+      );
+    }
+
+    function valueStartsWithSearch(targetValue, query) {
+      const target = buildSearchVariants(targetValue);
+
+      return Boolean(
+        (query.raw && target.raw.startsWith(query.raw))
+        || (query.normalized && target.normalized.startsWith(query.normalized))
+        || (query.compact && target.compact.startsWith(query.compact))
+      );
+    }
+
+    function valueIncludesSearch(targetValue, query) {
+      const target = buildSearchVariants(targetValue);
+
+      return Boolean(
+        (query.raw && target.raw.includes(query.raw))
+        || (query.normalized && target.normalized.includes(query.normalized))
+        || (query.compact && target.compact.includes(query.compact))
+      );
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function getRecipeAliases(recipe) {
+      return recipeAliases[recipe.name] || [];
+    }
+
+    function getRecipeCardKey(recipe) {
+      if (recipe.category === "drink") {
+        return "drink";
+      }
+
+      if (recipe.category === "colddrink") {
+        return "colddrink";
+      }
+
+      return recipe.type === "nonveg" ? "nonveg" : "veg";
+    }
+
+    function getRecipeSectionKey(recipe) {
+      const name = recipe.name.toLowerCase();
+
+      if (recipe.category === "drink") {
+        return "healthy-drinks";
+      }
+
+      if (recipe.category === "colddrink") {
+        return "cold-drinks";
+      }
+
+      if (recipe.protein === "chicken") {
+        return "chicken";
+      }
+
+      if (recipe.protein === "mutton") {
+        return "mutton";
+      }
+
+      if (recipe.protein === "fish") {
+        return "fish";
+      }
+
+      if (recipe.protein === "egg") {
+        return "egg";
+      }
+
+      if (recipe.meal === "dessert" || /(thekua|khaja|malpua|tilkut|petha|jalebi|ladoo|paan)/.test(name)) {
+        return "desserts";
+      }
+
+      if (name.includes("paneer")) {
+        return "paneer";
+      }
+
+      if (recipe.meal === "breakfast" || /(poha|upma|idli|dosa|uttapam|omelette|boiled egg|tea|green tea)/.test(name)) {
+        return "breakfast";
+      }
+
+      if (/(rice|biryani|pulao|chawal)/.test(name)) {
+        return "rice";
+      }
+
+      if (/(paratha|roti|naan|puri|kachori|sheermal)/.test(name)) {
+        return "breads";
+      }
+
+      if (recipe.category === "fastfood" || recipe.category === "junkfood" || /(pizza|burger|fries)/.test(name)) {
+        return "fast-food";
+      }
+
+      if (/(momos|chowmein|noodles|roll|frankie|sandwich|pakora|manchurian|soup|spring rolls|chaat|bhalla|ghugni|kabab|shawarma|lollipop|fingers|cutlet|tikka)/.test(name)) {
+        return "snacks";
+      }
+
+      if (/(dal|rajma|chole|kadhi|curry|bharta|bhaji|gobi|capsicum|sabzi|kofta|chokha|pitha|palak)/.test(name)) {
+        return "curries";
+      }
+
+      return recipe.type === "nonveg" ? "nonveg-specials" : "veg-specials";
+    }
+
+    function findRecipeIndexByDishName(dish) {
+      const normalizedDish = normalizeLookupValue(dish);
+
+      return recipes.findIndex(recipe => {
+        return [recipe.name, ...getRecipeAliases(recipe)].some(alias => normalizeLookupValue(alias) === normalizedDish);
+      });
+    }
+
+    function ensureDetailedRecipes() {
+      recipes.forEach(recipe => {
+        const defaultExtraSteps = recipe.category === "drink" || recipe.category === "colddrink"
+          ? [
+              "Taste the drink once before serving and balance sugar, salt, or lemon if needed.",
+              "Strain the drink only if you want a smoother texture.",
+              "Chill the serving glass for a cleaner and fresher finish.",
+              "Garnish with mint, fruit slices, or a light spice sprinkle before serving.",
+              "Serve immediately so the drink keeps its texture and freshness."
+            ]
+          : [
+              "Lower the heat if the masala starts sticking and add a small splash of water.",
+              "Taste the gravy midway and adjust salt, chilli, or tang according to preference.",
+              "Cook covered for a few minutes so the main ingredient absorbs the masala properly.",
+              "Check tenderness before finishing and cook a little longer if required.",
+              "Rest the dish briefly after turning off the heat so the flavors settle well."
+            ];
+
+        const seenSteps = new Set();
+        const mergedSteps = [...recipe.steps, ...defaultExtraSteps].filter(step => {
+          const key = normalizeLookupValue(step);
+
+          if (!key || seenSteps.has(key)) {
+            return false;
+          }
+
+          seenSteps.add(key);
+          return true;
+        });
+
+        recipe.steps = mergedSteps.slice(0, 12);
+      });
+    }
+
+    function getGeneratedRecipeCategory(name) {
+      const lowerName = name.toLowerCase();
+
+      if (/(pizza|burger|fries)/.test(lowerName)) {
+        return "fastfood";
+      }
+
+      if (/(momos|roll|frankie|sandwich|chowmein|noodles|shawarma|spring rolls|manchurian|lollipop|fingers|cutlet)/.test(lowerName)) {
+        return "junkfood";
+      }
+
+      return "";
+    }
+
+    function makeRecipeFromName(name, group) {
+      const isDrink = group === "drink" || group === "colddrink";
+      const type = group === "chicken" || group === "mutton" || group === "fish" || group === "egg" ? "nonveg" : "veg";
+      const meal = guessRecipeMeal(name, group);
+      const cleanImageName = name.replace(/[()]/g, "").replace(/\//g, " ");
+      const protein = ["chicken", "mutton", "fish", "egg"].includes(group) ? group : "";
+      const category = group === "drink" ? "drink" : group === "colddrink" ? "colddrink" : getGeneratedRecipeCategory(name);
+      const titleWords = name.split(" ");
+      const mainIngredient = protein ? protein : titleWords[0].replace(/[^A-Za-z]/g, "") || "vegetable";
+
+      return {
+        name,
+        country: group === "colddrink" ? "Global" : "India",
+        type,
+        protein,
+        meal,
+        category,
+        image: `https://source.unsplash.com/800x600/?${encodeURIComponent(cleanImageName)},food`,
+        summary: isDrink
+          ? `${name} served as a refreshing drink option.`
+          : `${name} prepared with homestyle spices and a practical step-by-step method.`,
+        ingredients: isDrink
+          ? [name, "Chilled water or milk", "Sugar or honey", "Ice cubes", "Mint or lemon if needed"]
+          : [mainIngredient, "Onion", "Tomato", "Ginger-garlic paste", "Oil or ghee", "Fresh coriander"],
+        spices: isDrink
+          ? ["Black salt", "Cardamom or roasted cumin", "Sugar to taste"]
+          : ["Turmeric", "Red chilli powder", "Coriander powder", "Garam masala", "Salt"],
+        steps: isDrink
+          ? [
+              "Keep all ingredients chilled before starting.",
+              "Wash and prepare any fruit, lemon, mint, or garnish.",
+              "Add the main drink ingredient to a blender or mixing glass.",
+              "Add chilled water or milk according to the drink style.",
+              "Add sugar, honey, or salt in a small amount first.",
+              "Blend or stir until smooth and evenly mixed.",
+              "Taste and adjust sweetness, salt, or lemon.",
+              "Add ice cubes to the serving glass.",
+              "Pour the drink slowly and garnish neatly.",
+              "Serve immediately while cold and fresh."
+            ]
+          : [
+              "Wash and prepare all ingredients before heating the pan.",
+              "Heat oil or ghee on medium flame.",
+              "Add whole spices if using and let them release aroma.",
+              "Cook onion until light golden.",
+              "Add ginger-garlic paste and saute until raw smell reduces.",
+              "Add tomato and cook until soft and glossy.",
+              "Mix in powdered spices and salt.",
+              "Add the main ingredient and coat it well with masala.",
+              "Add a little water, cover, and cook until tender.",
+              "Adjust gravy thickness and finish with coriander.",
+              "Rest for two minutes so flavors settle.",
+              "Serve hot with roti, rice, naan, or chutney."
+            ]
+      };
+    }
+
+    function addMissingRecipes() {
+      const existingNames = new Set(recipes.map(recipe => recipe.name.toLowerCase()));
+
+      Object.entries(extraRecipeNames).forEach(([group, names]) => {
+        names.forEach(name => {
+          if (existingNames.has(name.toLowerCase())) {
+            return;
+          }
+
+          recipes.push(makeRecipeFromName(name, group));
+          existingNames.add(name.toLowerCase());
+        });
+      });
+    }
+
+    addMissingRecipes();
+    ensureDetailedRecipes();
+
     const indianStateCollections = [
       {
         title: "Punjab",
@@ -2053,6 +3068,11 @@
         title: "Gujarat",
         subtitle: "Sweet, savory, and snack-heavy food",
         dishes: ["Dhokla", "Thepla", "Undhiyu", "Khandvi", "Gujarati Kadhi"]
+      },
+      {
+        title: "Bihar",
+        subtitle: "Sattu-rich comfort food, festive sweets, and rustic village-style cooking",
+        dishes: ["Litti Chokha", "Sattu Paratha", "Sattu Drink (Sattu Sharbat)", "Dal Pitha", "Thekua", "Khaja", "Malpua", "Kadhi Bari", "Bihari Fish Curry", "Champaran Mutton", "Ghugni", "Chana Sattu Ladoo", "Tilkut", "Baigan Bharta (Bihari Style)", "Aloo Chokha"]
       },
       {
         title: "Rajasthan",
@@ -2083,6 +3103,11 @@
         title: "Karnataka",
         subtitle: "Breakfast classics and regional rice dishes",
         dishes: ["Masala Dosa", "Upma", "Bisi Bele Bath", "Mysore Pak", "Ragi Mudde"]
+      },
+      {
+        title: "Uttar Pradesh",
+        subtitle: "Lucknow kebabs, biryani, hearty breakfasts, chaat, and iconic sweets",
+        dishes: ["Tunday Kabab", "Galouti Kabab", "Lucknowi Biryani", "Nihari", "Sheermal", "Puri Sabzi", "Bedmi Puri", "Kachori Sabzi", "Aloo Kachori", "Chaat", "Dahi Bhalla", "Papdi Chaat", "Banarasi Paan", "Agra Petha", "Jalebi"]
       },
       {
         title: "Goa",
@@ -2148,6 +3173,60 @@
         dishes: ["Greek Salad", "Moussaka", "Souvlaki", "Spanakopita", "Baklava"]
       }
     ];
+
+    function inferCollectionRecipeGroup(name) {
+      const lowerName = name.toLowerCase();
+
+      if (/(chicken|coq|fried chicken|xacuti|shawarma)/.test(lowerName)) {
+        return "chicken";
+      }
+
+      if (/(mutton|maas|rogan josh|nihari|yakhni|gushtaba|kebab|kabab|galouti|tunday|souvlaki|moussaka|haleem|vindaloo|beef)/.test(lowerName)) {
+        return "mutton";
+      }
+
+      if (/(fish|ilish|prawn|sushi|paella|seafood)/.test(lowerName)) {
+        return "fish";
+      }
+
+      if (/(egg|omelette)/.test(lowerName)) {
+        return "egg";
+      }
+
+      if (/(juice|tea|coffee|lassi|kahwa|sharbat)/.test(lowerName)) {
+        return "drink";
+      }
+
+      return "veg";
+    }
+
+    function addCollectionRecipes(collections, type) {
+      collections.forEach(collection => {
+        collection.dishes.forEach(dish => {
+          if (findRecipeIndexByDishName(dish) >= 0) {
+            return;
+          }
+
+          const group = inferCollectionRecipeGroup(dish);
+          const recipe = makeRecipeFromName(dish, group);
+
+          recipe.country = type === "country" ? collection.title : "India";
+          recipe.summary = type === "country"
+            ? `${dish} is a popular ${collection.title} dish now available in SpiceRoute.`
+            : `${dish} is a famous ${collection.title} dish now available in SpiceRoute.`;
+
+          recipes.push(recipe);
+        });
+      });
+    }
+
+    function ensureCollectionRecipes() {
+      addCollectionRecipes(indianStateCollections, "state");
+      addCollectionRecipes(countryCollections, "country");
+    }
+
+    ensureCollectionRecipes();
+    ensureDetailedRecipes();
 
     const translations = {
       en: {
@@ -2533,9 +3612,15 @@
     let currentLanguage = "en";
     let currentFilter = "all";
     let activeDetailView = null;
+    let detailReturnView = null;
     let filtersExpanded = false;
     let authMode = "login";
     let currentUser = null;
+    let siteRating = Number(localStorage.getItem("spiceroute-rating") || "0");
+    let recipeRatings = JSON.parse(localStorage.getItem("spiceroute-recipe-ratings") || "{}");
+    let recipeTextTranslations = JSON.parse(localStorage.getItem("spiceroute-text-translations") || "{}");
+    let profileOverrides = JSON.parse(localStorage.getItem("spiceroute-profile-overrides") || "{}");
+    let recipeDetailTranslationRequestId = 0;
     function resolveApiBaseUrl() {
       if (window.location.protocol === "file:") {
         return "http://127.0.0.1:8000/api";
@@ -2651,6 +3736,14 @@
       "Butter Chicken"
     ];
 
+    const recipeCardOrder = ["veg", "nonveg", "drink", "colddrink"];
+    const recipeCardSections = {
+      veg: ["paneer", "curries", "rice", "breakfast", "breads", "snacks", "fast-food", "desserts", "veg-specials"],
+      nonveg: ["chicken", "mutton", "fish", "egg", "nonveg-specials"],
+      drink: ["healthy-drinks"],
+      colddrink: ["cold-drinks"]
+    };
+
     function getMealGroup(recipe) {
       if (recipe.meal === "breakfast") {
         return "breakfast";
@@ -2677,13 +3770,47 @@
       return `${recipe.emoji ? `${recipe.emoji} ` : ""}${recipe.name}`;
     }
 
+    function getRecipeImage(recipe) {
+      return recipe.image || `https://source.unsplash.com/800x600/?${encodeURIComponent(`${recipe.name},${recipe.country},food`)}`;
+    }
+
+    function getGroupCardImage(groupKey, title = "") {
+      const queries = {
+        veg: "vegetarian indian curry platter",
+        nonveg: "chicken curry grilled meat platter",
+        drink: "fresh juice smoothie drinks",
+        colddrink: "cold drink soda ice glass",
+        breakfast: "indian breakfast dosa poha idli",
+        lunch: "indian lunch thali meal",
+        dinner: "indian dinner curry rice"
+      };
+
+      return `https://source.unsplash.com/900x650/?${encodeURIComponent(queries[groupKey] || `${title},food`)}`;
+    }
+
     function getTypeLabel(recipe) {
+      if (recipe.category === "drink") {
+        return te("drinkLabel", "Healthy Drink");
+      }
+
+      if (recipe.category === "colddrink") {
+        return te("coldDrinkLabel", "Cold Drink");
+      }
+
       if (recipe.protein === "chicken") {
         return t("chickenLabel");
       }
 
       if (recipe.protein === "mutton") {
         return t("muttonLabel");
+      }
+
+      if (recipe.protein === "fish") {
+        return te("fishLabel", "Fish");
+      }
+
+      if (recipe.protein === "egg") {
+        return te("eggLabel", "Egg");
       }
 
       return recipe.type === "veg" ? t("vegLabel") : t("nonvegLabel");
@@ -2693,7 +3820,7 @@
       const labels = {
         fastfood: t("fastFoodLabel"),
         junkfood: t("junkFoodLabel"),
-        colddrink: t("coldDrinkLabel")
+        drink: te("healthyDrinkLabel", "Healthy & Homemade")
       };
 
       return labels[recipe.category] || "";
@@ -2711,6 +3838,306 @@
       return labels[meal] || meal;
     }
 
+    function getCardTitle(cardKey) {
+      const labels = {
+        veg: te("vegCardTitle", "Veg Recipes"),
+        nonveg: te("nonVegCardTitle", "Non-Veg Recipes"),
+        drink: te("drinkCardTitle", "Drinks"),
+        colddrink: te("coldDrinkCardTitle", "Cold Drinks")
+      };
+
+      return labels[cardKey] || te("recipeGroups", "Recipe Groups");
+    }
+
+    function getCardDescription(cardKey) {
+      const descriptions = {
+        veg: te("vegCardDescription", "One main card for vegetarian recipes with clear sections like paneer, curry, rice, breakfast, breads, snacks, and sweets."),
+        nonveg: te("nonVegCardDescription", "Chicken, mutton, fish, and egg recipes are grouped inside one non-veg card so browsing stays simple."),
+        drink: te("drinkCardDescription", "Healthy and homemade drink options collected in one easy card."),
+        colddrink: te("coldDrinkCardDescription", "Popular cold drink options grouped in one place for quick browsing.")
+      };
+
+      return descriptions[cardKey] || "";
+    }
+
+    function getSectionTitle(sectionKey) {
+      const titles = {
+        paneer: te("paneerSection", "Paneer Section"),
+        curries: te("curriesSection", "Dal, Curry and Sabzi"),
+        rice: te("riceSection", "Rice, Pulao and Biryani"),
+        breakfast: te("breakfastSection", "Breakfast and Tiffin"),
+        breads: te("breadSection", "Breads and Filling Sides"),
+        snacks: te("snackSection", "Snacks and Street Food"),
+        "fast-food": te("fastFoodSection", "Fast Food Favourites"),
+        desserts: te("dessertSection", "Desserts and Festival Sweets"),
+        "veg-specials": te("vegSpecialSection", "More Veg Specials"),
+        chicken: te("chickenSection", "Chicken Section"),
+        mutton: te("muttonSection", "Mutton Section"),
+        fish: te("fishSection", "Fish Section"),
+        egg: te("eggSection", "Egg Section"),
+        "nonveg-specials": te("nonVegSpecialSection", "More Non-Veg Specials"),
+        "healthy-drinks": te("healthyDrinkSection", "Healthy and Homemade"),
+        "cold-drinks": te("coldDrinkSection", "Cold Drink Brands")
+      };
+
+      return titles[sectionKey] || sectionKey;
+    }
+
+    function matchesRecipeFilter(recipe) {
+      if (currentFilter === "all") {
+        return true;
+      }
+
+      return getRecipeClasses(recipe).split(" ").includes(currentFilter);
+    }
+
+    function getRecipeRatingKey(recipe) {
+      return normalizeLookupValue(recipe.name);
+    }
+
+    function getRecipeRating(recipe) {
+      return Number(recipeRatings[getRecipeRatingKey(recipe)] || 0);
+    }
+
+    function refreshRecipeViews() {
+      const currentView = activeDetailView ? { ...activeDetailView } : null;
+      const currentScrollPosition = window.scrollY || document.documentElement.scrollTop || 0;
+
+      renderRecipes();
+
+      if (!currentView) {
+        return;
+      }
+
+      if (currentView.type === "group") {
+        openRecipeGroupPage(currentView.groupKey, true, currentScrollPosition);
+      } else if (currentView.type === "recipe") {
+        openRecipePage(currentView.index, true, currentScrollPosition);
+      }
+    }
+
+    function setRecipeRating(index, stars, event) {
+      event?.preventDefault();
+      event?.stopPropagation();
+
+      const recipe = recipes[index];
+
+      if (!recipe) {
+        return;
+      }
+
+      recipeRatings[getRecipeRatingKey(recipe)] = stars;
+      localStorage.setItem("spiceroute-recipe-ratings", JSON.stringify(recipeRatings));
+      refreshRecipeViews();
+    }
+
+    function getRecipeTranslationLanguage() {
+      const supportedLanguages = {
+        en: "en",
+        hi: "hi",
+        gu: "gu",
+        mr: "mr",
+        te: "te",
+        bn: "bn",
+        bho: "bho"
+      };
+
+      return supportedLanguages[currentLanguage] || "en";
+    }
+
+    function getRecipeTranslationCacheKey(text, targetLanguage) {
+      return `${targetLanguage}::${text}`;
+    }
+
+    function persistRecipeTextTranslations() {
+      try {
+        localStorage.setItem("spiceroute-text-translations", JSON.stringify(recipeTextTranslations));
+      } catch (error) {
+        // Ignore quota errors and keep the in-memory cache working.
+      }
+    }
+
+    async function translateRecipeText(text, targetLanguage) {
+      const sourceText = String(text || "").trim();
+
+      if (!sourceText || targetLanguage === "en") {
+        return sourceText;
+      }
+
+      const cacheKey = getRecipeTranslationCacheKey(sourceText, targetLanguage);
+
+      if (recipeTextTranslations[cacheKey]) {
+        return recipeTextTranslations[cacheKey];
+      }
+
+      try {
+        const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(sourceText)}&langpair=en|${encodeURIComponent(targetLanguage)}`);
+        const data = await response.json();
+        const translatedText = String(data?.responseData?.translatedText || "").trim();
+        const safeText = translatedText && !translatedText.includes("PLEASE SELECT TWO DISTINCT LANGUAGES")
+          ? translatedText
+          : sourceText;
+
+        recipeTextTranslations[cacheKey] = safeText;
+        persistRecipeTextTranslations();
+        return safeText;
+      } catch (error) {
+        return sourceText;
+      }
+    }
+
+    async function translateRecipeTextList(items, targetLanguage) {
+      if (targetLanguage === "en") {
+        return items;
+      }
+
+      const uniqueItems = [...new Set(items)];
+      const translatedEntries = await Promise.all(uniqueItems.map(async item => {
+        return [item, await translateRecipeText(item, targetLanguage)];
+      }));
+      const translatedMap = Object.fromEntries(translatedEntries);
+
+      return items.map(item => translatedMap[item] || item);
+    }
+
+    function renderRecipeDetailList(containerId, items, ordered = false) {
+      const list = document.getElementById(containerId);
+
+      if (!list) {
+        return;
+      }
+
+      const itemTag = ordered ? "li" : "li";
+      list.innerHTML = items.map(item => `<${itemTag}>${escapeHtml(item)}</${itemTag}>`).join("");
+    }
+
+    async function localizeRecipeDetailContent(recipe) {
+      const translationLanguage = getRecipeTranslationLanguage();
+      const requestId = ++recipeDetailTranslationRequestId;
+
+      if (translationLanguage === "en") {
+        return;
+      }
+
+      const [ingredients, spices, steps] = await Promise.all([
+        translateRecipeTextList(recipe.ingredients, translationLanguage),
+        translateRecipeTextList(recipe.spices, translationLanguage),
+        translateRecipeTextList(recipe.steps, translationLanguage)
+      ]);
+
+      if (
+        requestId !== recipeDetailTranslationRequestId
+        || !activeDetailView
+        || activeDetailView.type !== "recipe"
+        || recipes[activeDetailView.index] !== recipe
+      ) {
+        return;
+      }
+
+      renderRecipeDetailList("detailIngredientsList", ingredients);
+      renderRecipeDetailList("detailSpicesList", spices);
+      renderRecipeDetailList("detailStepsList", steps, true);
+    }
+
+    function getMealCardTitle(mealKey) {
+      const labels = {
+        breakfast: te("breakfastCardTitle", "Breakfast Recipes"),
+        lunch: te("lunchCardTitle", "Lunch Recipes"),
+        dinner: te("dinnerCardTitle", "Dinner Recipes")
+      };
+
+      return labels[mealKey] || mealKey;
+    }
+
+    function getMealCardDescription(mealKey) {
+      const descriptions = {
+        breakfast: te("breakfastCardDescription", "Morning dishes grouped together in one hidden breakfast card."),
+        lunch: te("lunchCardDescription", "Midday meals collected inside one lunch group card."),
+        dinner: te("dinnerCardDescription", "Dinner favourites grouped together in one easy evening card.")
+      };
+
+      return descriptions[mealKey] || "";
+    }
+
+    function getUserStorageKey(email) {
+      return (email || "").trim().toLowerCase();
+    }
+
+    function applyProfileOverrides(user) {
+      if (!user) {
+        return null;
+      }
+
+      const overrides = profileOverrides[getUserStorageKey(user.email)] || {};
+      return { ...user, ...overrides };
+    }
+
+    function persistCurrentUser() {
+      if (currentUser) {
+        localStorage.setItem("spiceroute-session", JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem("spiceroute-session");
+      }
+    }
+
+    function showProfileMessage(message, isError = false) {
+      const node = document.getElementById("profileMessage");
+      node.textContent = message;
+      node.classList.toggle("error", isError);
+    }
+
+    function openProfileModal() {
+      if (!currentUser) {
+        return;
+      }
+
+      closeAuthModal();
+      const user = applyProfileOverrides(currentUser);
+      document.getElementById("profileName").value = user.name || "";
+      document.getElementById("profileEmail").value = user.email || "";
+      document.getElementById("profilePhone").value = user.phone || "";
+      document.getElementById("profileCity").value = user.city || "";
+      document.getElementById("profileCuisine").value = user.cuisine || "";
+      document.getElementById("profileModal").classList.remove("hidden");
+      showProfileMessage("");
+      document.getElementById("profileName").focus();
+      closeQuickBoxes();
+    }
+
+    function closeProfileModal() {
+      document.getElementById("profileModal").classList.add("hidden");
+      showProfileMessage("");
+    }
+
+    function submitProfile(event) {
+      event.preventDefault();
+
+      if (!currentUser) {
+        return;
+      }
+
+      const storageKey = getUserStorageKey(currentUser.email);
+      const nextProfile = {
+        name: document.getElementById("profileName").value.trim(),
+        phone: document.getElementById("profilePhone").value.trim(),
+        city: document.getElementById("profileCity").value.trim(),
+        cuisine: document.getElementById("profileCuisine").value.trim()
+      };
+
+      if (!nextProfile.name) {
+        showProfileMessage("Please enter your full name.", true);
+        return;
+      }
+
+      profileOverrides[storageKey] = nextProfile;
+      localStorage.setItem("spiceroute-profile-overrides", JSON.stringify(profileOverrides));
+      currentUser = applyProfileOverrides({ ...currentUser, ...nextProfile });
+      persistCurrentUser();
+      updateAuthUI();
+      showProfileMessage(te("profileSaved", "Profile updated for this device."));
+      setTimeout(() => closeProfileModal(), 500);
+    }
+
     function refreshStaticText() {
       document.documentElement.lang = currentLanguage;
       document.title = t("pageTitle");
@@ -2723,10 +4150,19 @@
       document.getElementById("languageLabel").textContent = t("language");
       document.getElementById("stateSummary").textContent = t("states");
       document.getElementById("countrySummary").textContent = t("countries");
+      document.getElementById("menuSummary").textContent = te("menuTitle", "Menu");
+      document.getElementById("menuStateHeading").textContent = te("menuStateHeadingText", "State");
+      document.getElementById("menuCountryHeading").textContent = te("menuCountryHeadingText", "Country");
+      document.getElementById("menuLanguageHeading").textContent = te("menuLanguageHeadingText", "Language Changer");
+      document.getElementById("menuRatingHeading").textContent = te("menuRatingHeadingText", "Rating");
+      document.getElementById("menuLoginHeading").textContent = te("menuLoginHeadingText", "Login / Signup");
+      document.getElementById("menuProfileHeading").textContent = te("menuProfileHeadingText", "Profile Options");
       document.getElementById("search").placeholder = t("searchPlaceholder");
       document.getElementById("breakfastHeading").textContent = t("breakfastHeading");
       document.getElementById("lunchHeading").textContent = t("lunchHeading");
       document.getElementById("dinnerHeading").textContent = t("dinnerHeading");
+      document.getElementById("languageSelect").value = currentLanguage;
+      document.getElementById("menuLanguageSelect").value = currentLanguage;
 
       const filterText = {
         "filter-all": t("filterAll"),
@@ -2734,6 +4170,9 @@
         "filter-nonveg": t("filterNonVeg"),
         "filter-chicken": t("filterChicken"),
         "filter-mutton": t("filterMutton"),
+        "filter-fish": te("filterFish", "Fish"),
+        "filter-egg": te("filterEgg", "Eggs"),
+        "filter-drink": te("filterDrink", "Healthy Drinks"),
         "filter-fastfood": t("filterFastFood"),
         "filter-junkfood": t("filterJunkFood"),
         "filter-colddrink": t("filterColdDrink"),
@@ -2772,14 +4211,39 @@
         ? te("signupButton", "Signup")
         : te("loginButton", "Login");
       document.getElementById("authCloseButton").textContent = te("closeButton", "Close");
-      document.getElementById("authOpenButton").textContent = te("authOpen", "Login / Signup");
+      document.getElementById("authOpenButtonText").textContent = te("authOpen", "Login / Signup");
+      document.getElementById("menuLoginButtonText").textContent = te("authOpen", "Login / Signup");
+      document.getElementById("menuEditProfileButton").textContent = te("editProfileButton", "Edit Profile");
+      document.getElementById("menuLogoutButton").textContent = te("logoutButton", "Logout");
       document.getElementById("logoutButton").textContent = te("logoutButton", "Logout");
+      document.getElementById("profileHeading").textContent = te("profileHeading", "Edit Profile");
+      document.getElementById("profileIntro").textContent = te("profileIntro", "Update a few user details for this device. These profile edits stay local in your browser.");
+      document.getElementById("profileNameLabel").textContent = te("nameLabel", "Full Name");
+      document.getElementById("profileEmailLabel").textContent = te("emailLabel", "Email");
+      document.getElementById("profilePhoneLabel").textContent = te("profilePhoneLabel", "Phone Number");
+      document.getElementById("profileCityLabel").textContent = te("profileCityLabel", "City / State");
+      document.getElementById("profileCuisineLabel").textContent = te("profileCuisineLabel", "Favorite Cuisine");
+      document.getElementById("profileName").placeholder = te("namePlaceholder", "Enter your name");
+      document.getElementById("profilePhone").placeholder = te("profilePhonePlaceholder", "Optional phone number");
+      document.getElementById("profileCity").placeholder = te("profileCityPlaceholder", "Optional city or state");
+      document.getElementById("profileCuisine").placeholder = te("profileCuisinePlaceholder", "Optional favorite cuisine");
+      document.getElementById("profileSaveButton").textContent = te("profileSaveButton", "Save Profile");
+      document.getElementById("profileCloseButton").textContent = te("closeButton", "Close");
+      updateRatingUI();
     }
 
-    function closeQuickBoxes() {
+    function closeQuickBoxes(closeMenu = true) {
       document.querySelectorAll(".quick-box").forEach(box => {
         box.open = false;
       });
+
+      document.querySelectorAll(".menu-nested").forEach(panel => {
+        panel.open = false;
+      });
+
+      if (closeMenu) {
+        document.getElementById("mainMenu").open = false;
+      }
     }
 
     function enhanceControlsLayout() {
@@ -2791,6 +4255,8 @@
       }
 
       const chips = Array.from(controls.querySelectorAll(".chip"));
+      const visibleFilterIds = ["filter-all", "filter-veg", "filter-nonveg", "filter-drink", "filter-colddrink"];
+      const filterOrder = [...visibleFilterIds, "filter-chicken", "filter-mutton", "filter-fish", "filter-egg", "filter-breakfast", "filter-lunch", "filter-dinner", "filter-snack", "filter-fastfood", "filter-junkfood", "filter-dessert"];
       const searchShell = document.createElement("div");
       const searchWrap = document.createElement("div");
       const icon = document.createElement("span");
@@ -2829,21 +4295,22 @@
 
       searchWrap.append(icon, searchInput, clearButton);
       searchShell.appendChild(searchWrap);
-      controls.prepend(searchShell);
+      chips.sort((left, right) => filterOrder.indexOf(left.id) - filterOrder.indexOf(right.id));
 
       chips.forEach((chip, index) => {
-        if (index > 1) {
+        if (index >= visibleFilterIds.length) {
           chip.classList.add("extra-filter", "is-collapsed");
         }
 
         filtersBar.appendChild(chip);
       });
 
-      if (chips.length > 2) {
+      if (chips.length > visibleFilterIds.length) {
         filtersBar.appendChild(moreButton);
       }
 
       controls.appendChild(filtersBar);
+      controls.appendChild(searchShell);
       controls.dataset.enhanced = "true";
       syncSearchControls();
       refreshStaticText();
@@ -2864,7 +4331,7 @@
       filtersExpanded = !filtersExpanded;
 
       document.querySelectorAll(".extra-filter").forEach(chip => {
-        chip.classList.toggle("is-collapsed", !filtersExpanded);
+        chip.classList.toggle("is-collapsed", !filtersExpanded && !chip.classList.contains("active"));
       });
 
       const moreButton = document.getElementById("moreFiltersButton");
@@ -2872,6 +4339,38 @@
         moreButton.classList.toggle("active", filtersExpanded);
         moreButton.textContent = filtersExpanded ? te("lessFilters", "Less Filters") : te("moreFilters", "More Filters");
       }
+    }
+
+    function updateRatingUI() {
+      const ratingStatus = document.getElementById("ratingStatus");
+
+      if (!ratingStatus) {
+        return;
+      }
+
+      ratingStatus.textContent = siteRating
+        ? te("ratingSelected", "{stars} star rating selected.", { stars: siteRating })
+        : te("ratingDefault", "No rating selected.");
+    }
+
+    function setSiteRating(stars) {
+      siteRating = stars;
+      localStorage.setItem("spiceroute-rating", String(stars));
+      updateRatingUI();
+      closeQuickBoxes();
+    }
+
+    function syncMenuLanguage() {
+      const menuLanguageSelect = document.getElementById("menuLanguageSelect");
+      const mainLanguageSelect = document.getElementById("languageSelect");
+
+      if (!menuLanguageSelect || !mainLanguageSelect) {
+        return;
+      }
+
+      mainLanguageSelect.value = menuLanguageSelect.value;
+      changeLanguage();
+      closeQuickBoxes(false);
     }
 
     function showAuthMessage(message, isError = false) {
@@ -2920,8 +4419,10 @@
     }
 
     function openAuthModal() {
+      closeProfileModal();
       document.getElementById("authModal").classList.remove("hidden");
       switchAuthMode(authMode);
+      closeQuickBoxes();
       const targetField = authMode === "signup" ? document.getElementById("authName") : document.getElementById("authEmail");
       targetField.focus();
     }
@@ -2939,17 +4440,25 @@
       const greeting = document.getElementById("userGreeting");
       const status = document.getElementById("userStatus");
       const openButton = document.getElementById("authOpenButton");
+      const menuOpenButton = document.getElementById("menuLoginButton");
+      const menuProfileBlock = document.getElementById("menuProfileBlock");
       const logoutButton = document.getElementById("logoutButton");
 
       if (currentUser) {
-        greeting.textContent = `${te("helloUser", "Hello")}, ${currentUser.name}`;
-        status.textContent = te("loggedInState", "Signed in on this device.");
+        greeting.textContent = currentUser.name || currentUser.email;
+        status.textContent = "";
+        status.classList.add("hidden");
         openButton.classList.add("hidden");
-        logoutButton.classList.remove("hidden");
+        menuOpenButton.classList.add("hidden");
+        menuProfileBlock.classList.remove("hidden");
+        logoutButton.classList.add("hidden");
       } else {
         greeting.textContent = te("guestUser", "Guest User");
         status.textContent = te("guestState", "Login to save your session on this device.");
+        status.classList.remove("hidden");
         openButton.classList.remove("hidden");
+        menuOpenButton.classList.remove("hidden");
+        menuProfileBlock.classList.add("hidden");
         logoutButton.classList.add("hidden");
       }
     }
@@ -2976,11 +4485,13 @@
           }
 
           currentUser = await backendApi.signup({ name, email, password });
-          localStorage.setItem("spiceroute-session", JSON.stringify(currentUser));
+          currentUser = applyProfileOverrides(currentUser);
+          persistCurrentUser();
           showAuthMessage(te("signupSuccess", "Account created successfully."));
         } else {
           currentUser = await backendApi.login({ email, password });
-          localStorage.setItem("spiceroute-session", JSON.stringify(currentUser));
+          currentUser = applyProfileOverrides(currentUser);
+          persistCurrentUser();
           showAuthMessage(te("loginSuccess", "Login successful."));
         }
 
@@ -2994,8 +4505,12 @@
 
     async function logoutUser() {
       await backendApi.logout();
+      closeProfileModal();
       currentUser = null;
+      detailReturnView = null;
+      persistCurrentUser();
       updateAuthUI();
+      closeQuickBoxes();
     }
 
     const clickLocks = {};
@@ -3041,6 +4556,47 @@
       });
     }
 
+    function renderMenuCollections() {
+      const menuStateList = document.getElementById("menuStateList");
+      const menuCountryList = document.getElementById("menuCountryList");
+      const mainMenu = document.getElementById("mainMenu");
+      const nestedPanels = document.querySelectorAll(".menu-nested");
+
+      menuStateList.innerHTML = indianStateCollections.map((item, index) => `
+        <button class="quick-item" type="button" onclick="openCollection('state', ${index})">${item.title}</button>
+      `).join("");
+
+      menuCountryList.innerHTML = countryCollections.map((item, index) => `
+        <button class="quick-item" type="button" onclick="openCollection('country', ${index})">${item.title}</button>
+      `).join("");
+
+      if (mainMenu && mainMenu.dataset.listenerAttached !== "true") {
+        mainMenu.dataset.listenerAttached = "true";
+        mainMenu.addEventListener("toggle", () => {
+          if (mainMenu.open) {
+            closeQuickBoxes(false);
+          }
+        });
+      }
+
+      nestedPanels.forEach(panel => {
+        if (panel.dataset.listenerAttached === "true") {
+          return;
+        }
+
+        panel.dataset.listenerAttached = "true";
+        panel.addEventListener("toggle", () => {
+          if (panel.open) {
+            nestedPanels.forEach(otherPanel => {
+              if (otherPanel !== panel) {
+                otherPanel.open = false;
+              }
+            });
+          }
+        });
+      });
+    }
+
     function renderMealLists() {
       const groups = {
         breakfast: [],
@@ -3066,6 +4622,7 @@
         return;
       }
 
+      detailReturnView = null;
       activeDetailView = { type, index };
       closeQuickBoxes();
 
@@ -3088,7 +4645,7 @@
         </section>
         <section class="detail-grid">
           ${collection.dishes.map(dish => {
-            const recipeIndex = recipes.findIndex(recipe => recipe.name.toLowerCase() === dish.toLowerCase());
+            const recipeIndex = findRecipeIndexByDishName(dish);
             const button = recipeIndex >= 0
               ? `<button class="view-btn" onclick="openRecipePage(${recipeIndex})">${t("openFullRecipe")}</button>`
               : `<button class="view-btn" onclick="searchDish('${dish.replace(/'/g, "\\'")}')">${t("searchDish")}</button>`;
@@ -3119,7 +4676,7 @@
       scrollToRecipeResults();
     }
 
-    function showDetailPage() {
+    function showDetailPage(scrollPosition = null) {
       document.body.classList.add("detail-open");
       document.getElementById("topTools").classList.add("hidden");
       document.querySelector(".dark-toggle").classList.add("hidden");
@@ -3130,42 +4687,367 @@
       document.getElementById("recipes").classList.add("hidden");
       document.getElementById("detailPage").classList.add("active");
       closeQuickBoxes();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      if (typeof scrollPosition === "number") {
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: scrollPosition, behavior: "auto" });
+        });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+
+    function renderRecipeRating(item) {
+      const rating = getRecipeRating(item.recipe);
+
+      return `
+        <div class="recipe-rating-box">
+          <span class="recipe-rating-label">${te("recipeRatingLabel", "Rate 1 to 5 stars")}</span>
+          <div class="recipe-rating">
+            ${[1, 2, 3, 4, 5].map(stars => `
+              <button
+                class="rating-star ${rating >= stars ? "is-filled" : ""}"
+                type="button"
+                aria-label="${te("rateThisRecipe", "Rate this recipe")} ${stars}"
+                onclick="setRecipeRating(${item.index}, ${stars}, event)"
+              >&#9733;</button>
+            `).join("")}
+            <span class="rating-value">${rating ? `${rating}/5` : te("unratedLabel", "Not rated")}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRecipeOption(item, topMatchIds) {
+      return `
+        <article class="recipe recipe-option ${topMatchIds.has(item.index) ? "search-top-match" : ""}">
+          <div class="img-box">
+            <img
+              src="${getRecipeImage(item.recipe)}"
+              alt="${escapeHtml(getRecipeTitle(item.recipe))}"
+              title="${escapeHtml(getRecipeTitle(item.recipe))}"
+              loading="lazy"
+              onerror="showImageFallback(this)"
+            >
+            <div class="overlay">
+              <span>${getRecipeTitle(item.recipe)}</span>
+              <button class="view-btn" type="button" onclick="openRecipePage(${item.index})">${t("open")}</button>
+            </div>
+          </div>
+          <div class="content">
+            <div class="title">${getRecipeTitle(item.recipe)}</div>
+            <p class="summary">${item.recipe.summary}</p>
+            <div class="meta">
+              <span>${item.recipe.country}</span>
+              <span>${getTypeLabel(item.recipe)}</span>
+              ${getCategoryLabel(item.recipe) ? `<span>${getCategoryLabel(item.recipe)}</span>` : ""}
+              <span>${getMealLabel(item.recipe.meal)}</span>
+              <span>${t("stepsCount", { count: item.recipe.steps.length })}</span>
+            </div>
+            <div class="recipe-card-footer">
+              ${renderRecipeRating(item)}
+              <div class="recipe-card-actions">
+                <button class="view-btn recipe-open-btn" type="button" onclick="openRecipePage(${item.index})">${t("open")}</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderSearchResultsCard(searchText, matchedRecipes, topMatchIds) {
+      return `
+        <article class="recipe-main-card search-results-card reveal-ready">
+          <div class="recipe-main-head">
+            <div class="recipe-main-copy">
+              <h2>${te("searchResultsTitle", "Search Results")}</h2>
+              <p>${te("searchResultsText", "Matching recipes are shown first so users can open the exact dish quickly.")}</p>
+            </div>
+            <div class="card-summary-meta">
+              <span class="card-total">${te("recipeCount", "{count} recipes", { count: matchedRecipes.length })}</span>
+              <span class="card-total">${te("searchForLabel", "Search")}: ${escapeHtml(searchText)}</span>
+            </div>
+          </div>
+          <div class="results-empty">
+            <div class="recipe-options">
+              ${matchedRecipes.map(item => renderRecipeOption(item, topMatchIds)).join("")}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderEmptyRecipeState(searchText = "") {
+      const description = searchText
+        ? te("searchNoResultsText", "No recipe matched this search. Try another name, ingredient, or filter.")
+        : te("noResultsText", "Try another search term or open more filters to browse more recipe groups.");
+
+      return `
+        <article class="recipe-main-card empty-state reveal-ready">
+          <div class="recipe-main-head">
+            <h2>${te("noResultsTitle", "No recipes found")}</h2>
+            <p>${description}</p>
+          </div>
+          <div class="results-empty">
+            <p>${te("noResultsHint", "You can search by dish name, ingredient, state special, or use Veg, Non-Veg, Drinks, and Cold Drinks filters.")}</p>
+          </div>
+        </article>
+      `;
+    }
+
+    function recipeMatchesSearch(item, searchQuery) {
+      if (!searchQuery.raw && !searchQuery.compact) {
+        return true;
+      }
+
+      if (
+        (searchQuery.raw && item.searchableText.includes(searchQuery.raw))
+        || (searchQuery.normalized && item.normalizedSearchableText.includes(searchQuery.normalized))
+        || (searchQuery.compact && item.compactSearchableText.includes(searchQuery.compact))
+      ) {
+        return true;
+      }
+
+      const searchTokens = searchQuery.normalized ? searchQuery.normalized.split(" ").filter(Boolean) : [];
+
+      return searchTokens.length > 1 && searchTokens.every(token => item.normalizedSearchableText.includes(token));
+    }
+
+    function getMatchedRecipeResults() {
+      const searchText = document.getElementById("search").value.trim();
+      const searchQuery = buildSearchVariants(searchText);
+      const matchedRecipes = recipes.map((recipe, index) => {
+        const searchableText = buildSearchableText(recipe);
+
+        return {
+          recipe,
+          index,
+          searchableText,
+          normalizedSearchableText: normalizeSearchValue(searchableText),
+          compactSearchableText: normalizeLookupValue(searchableText),
+          score: getSearchScore(recipe, searchQuery)
+        };
+      }).filter(item => {
+        return matchesRecipeFilter(item.recipe) && recipeMatchesSearch(item, searchQuery);
+      });
+
+      matchedRecipes.sort((left, right) => {
+        if (searchQuery.compact && right.score !== left.score) {
+          return right.score - left.score;
+        }
+
+        return left.recipe.name.localeCompare(right.recipe.name);
+      });
+
+      return {
+        searchText,
+        matchedRecipes,
+        hasSearch: Boolean(searchQuery.compact),
+        topMatchIds: new Set((searchQuery.compact ? matchedRecipes.slice(0, 3) : []).map(item => item.index))
+      };
+    }
+
+    function getGroupedRecipeResults(matchedRecipes) {
+      const groupedByCard = {
+        veg: {},
+        nonveg: {},
+        drink: {},
+        colddrink: {}
+      };
+      const groupedByMeal = {
+        breakfast: [],
+        lunch: [],
+        dinner: []
+      };
+
+      matchedRecipes.forEach(item => {
+        const cardKey = getRecipeCardKey(item.recipe);
+        const sectionKey = getRecipeSectionKey(item.recipe);
+        const mealKey = getMealGroup(item.recipe);
+
+        if (!groupedByCard[cardKey][sectionKey]) {
+          groupedByCard[cardKey][sectionKey] = [];
+        }
+
+        groupedByCard[cardKey][sectionKey].push(item);
+        groupedByMeal[mealKey].push(item);
+      });
+
+      return { groupedByCard, groupedByMeal };
+    }
+
+    function renderGroupLaunchCard(groupKey, className, title, description, totalRecipes, cardIndex) {
+      return `
+        <article class="recipe-main-card group-launch-card ${className} reveal-ready" style="animation-delay: ${Math.min(cardIndex * 0.08, 0.45)}s">
+          <button class="group-launch" type="button" onclick="openRecipeGroupPage('${groupKey}')">
+            <div class="group-launch-visual">
+              <img src="${getGroupCardImage(groupKey, title)}" alt="${escapeHtml(title)}" loading="lazy" onerror="showImageFallback(this)">
+              <div class="group-launch-overlay">
+                <span class="card-total">${te("recipeCount", "{count} recipes", { count: totalRecipes })}</span>
+              </div>
+            </div>
+            <div class="group-launch-body">
+              <div class="recipe-main-head">
+                <div class="recipe-main-copy">
+                  <h2>${title}</h2>
+                  <p>${description}</p>
+                </div>
+                <div class="card-summary-meta">
+                  <span class="card-total">${te("groupRecipesBadge", "Group Recipes")}</span>
+                  <span class="card-chevron">&#10132;</span>
+                </div>
+              </div>
+              <p class="group-hint">${te("groupOpenHint", "Open this main card on a separate page to see all recipes inside it.")}</p>
+            </div>
+          </button>
+        </article>
+      `;
+    }
+
+    function renderRecipeCard(cardKey, groupedSections, topMatchIds, cardIndex, searchText) {
+      const orderedSections = recipeCardSections[cardKey] || [];
+      const totalRecipes = Object.values(groupedSections).reduce((sum, items) => sum + items.length, 0);
+
+      if (!totalRecipes) {
+        return "";
+      }
+
+      return renderGroupLaunchCard(
+        cardKey,
+        `${cardKey}-group`,
+        getCardTitle(cardKey),
+        getCardDescription(cardKey),
+        totalRecipes,
+        cardIndex
+      );
+    }
+
+    function renderMealGroupCard(mealKey, items, topMatchIds, cardIndex, searchText) {
+      if (!items.length) {
+        return "";
+      }
+
+      return renderGroupLaunchCard(
+        mealKey,
+        `${mealKey}-group`,
+        getMealCardTitle(mealKey),
+        getMealCardDescription(mealKey),
+        items.length,
+        cardIndex
+      );
+    }
+
+    function renderGroupDetailSections(groupKey, groupedResults, topMatchIds) {
+      if (["breakfast", "lunch", "dinner"].includes(groupKey)) {
+        const items = groupedResults.groupedByMeal[groupKey] || [];
+
+        return `
+          <article class="detail-card">
+            <h3>${te("allRecipesSection", "All Recipes")} <span class="section-total">${items.length}</span></h3>
+            <div class="recipe-options">
+              ${items.map(item => renderRecipeOption(item, topMatchIds)).join("")}
+            </div>
+          </article>
+        `;
+      }
+
+      const groupedSections = groupedResults.groupedByCard[groupKey] || {};
+      const orderedSections = recipeCardSections[groupKey] || [];
+
+      return orderedSections.map(sectionKey => {
+        const items = groupedSections[sectionKey] || [];
+
+        if (!items.length) {
+          return "";
+        }
+
+        return `
+          <article class="detail-card">
+            <h3>${getSectionTitle(sectionKey)} <span class="section-total">${items.length}</span></h3>
+            <div class="recipe-options">
+              ${items.map(item => renderRecipeOption(item, topMatchIds)).join("")}
+            </div>
+          </article>
+        `;
+      }).join("");
     }
 
     function renderRecipes() {
       const container = document.getElementById("recipes");
+      const { searchText, matchedRecipes, hasSearch, topMatchIds } = getMatchedRecipeResults();
+      const groupedResults = getGroupedRecipeResults(matchedRecipes);
 
-      container.innerHTML = recipes.map((recipe, index) => `
-        <article class="recipe reveal-ready ${getRecipeClasses(recipe)}" data-recipe-index="${index}" style="animation-delay: ${Math.min(index * 0.025, 0.45)}s" onclick="openRecipePage(${index})">
-          <div class="img-box">
-            <img src="${recipe.image}" alt="${getRecipeTitle(recipe)}" title="${getRecipeTitle(recipe)}" loading="lazy" onerror="showImageFallback(this)">
-            <div class="overlay">
-              <span>${getRecipeTitle(recipe)}</span>
-              <button class="view-btn" onclick="event.stopPropagation(); openRecipePage(${index});">${t("open")}</button>
-            </div>
-          </div>
-          <div class="content">
-            <div class="title">${getRecipeTitle(recipe)}</div>
-            <p class="summary">${recipe.summary}</p>
-            <div class="meta">
-              <span class="badge">${recipe.country}</span>
-              <span class="badge">${getTypeLabel(recipe)}</span>
-              ${getCategoryLabel(recipe) ? `<span class="badge">${getCategoryLabel(recipe)}</span>` : ""}
-              <span class="badge">${getMealLabel(recipe.meal)}</span>
-              <span class="badge">${t("stepsCount", { count: recipe.steps.length })}</span>
-            </div>
-          </div>
-        </article>
-      `).join("");
+      if (hasSearch) {
+        container.innerHTML = matchedRecipes.length
+          ? renderSearchResultsCard(searchText, matchedRecipes, topMatchIds)
+          : renderEmptyRecipeState(searchText);
+      } else {
+        const cardsMarkup = recipeCardOrder.map((cardKey, cardIndex) => {
+          return renderRecipeCard(cardKey, groupedResults.groupedByCard[cardKey], topMatchIds, cardIndex, searchText);
+        }).filter(Boolean).join("");
 
-      updateRecipes();
+        const mealCardsMarkup = ["breakfast", "lunch", "dinner"].map((mealKey, mealIndex) => {
+          return renderMealGroupCard(mealKey, groupedResults.groupedByMeal[mealKey], topMatchIds, recipeCardOrder.length + mealIndex, searchText);
+        }).filter(Boolean).join("");
+
+        container.innerHTML = (cardsMarkup + mealCardsMarkup) || renderEmptyRecipeState();
+      }
+
+      document.getElementById("stats").textContent = t("statsShown", { visible: matchedRecipes.length, total: recipes.length });
       setupScrollReveal();
+    }
+
+    function openRecipeGroupPage(groupKey, skipLock = false, scrollPosition = null) {
+      if (!skipLock && ignoreFastDoubleClick(`group-${groupKey}`)) {
+        return;
+      }
+
+      detailReturnView = null;
+      activeDetailView = { type: "group", groupKey };
+      closeQuickBoxes();
+
+      const { searchText, matchedRecipes, topMatchIds } = getMatchedRecipeResults();
+      const groupedResults = getGroupedRecipeResults(matchedRecipes);
+      const isMealGroup = ["breakfast", "lunch", "dinner"].includes(groupKey);
+      const totalRecipes = isMealGroup
+        ? (groupedResults.groupedByMeal[groupKey] || []).length
+        : Object.values(groupedResults.groupedByCard[groupKey] || {}).reduce((sum, items) => sum + items.length, 0);
+      const title = isMealGroup ? getMealCardTitle(groupKey) : getCardTitle(groupKey);
+      const description = isMealGroup ? getMealCardDescription(groupKey) : getCardDescription(groupKey);
+      const groupContent = renderGroupDetailSections(groupKey, groupedResults, topMatchIds);
+      const detailPage = document.getElementById("detailPage");
+
+      detailPage.innerHTML = `
+        <button class="back-btn" onclick="closeRecipePage()">${t("back")}</button>
+        <section class="detail-hero">
+          <img src="${getGroupCardImage(groupKey, title)}" alt="${title}" onerror="showImageFallback(this)">
+          <div class="detail-intro">
+            <h2>${title}</h2>
+            <p class="summary">${description}</p>
+            <div class="meta">
+              <span class="badge">${te("groupRecipesBadge", "Group Recipes")}</span>
+              <span class="badge">${te("recipeCount", "{count} recipes", { count: totalRecipes })}</span>
+              ${searchText ? `<span class="badge">${te("searchForLabel", "Search")}: ${escapeHtml(searchText)}</span>` : ""}
+            </div>
+          </div>
+        </section>
+        <section class="detail-grid group-detail-grid">
+          ${groupContent || `
+            <article class="detail-card">
+              <h3>${te("noRecipesTitle", "No recipes available")}</h3>
+              <p class="summary">${te("noResultsText", "Try another search term or open more filters to browse more recipe groups.")}</p>
+            </article>
+          `}
+        </section>
+      `;
+
+      showDetailPage(scrollPosition);
     }
 
     function buildSearchableText(recipe) {
       return [
         recipe.name,
+        ...getRecipeAliases(recipe),
         recipe.emoji || "",
         recipe.country,
         recipe.type,
@@ -3179,49 +5061,54 @@
       ].join(" ").toLowerCase();
     }
 
-    function getSearchScore(recipe, searchText) {
-      if (!searchText) {
+    function getSearchScore(recipe, searchQuery) {
+      if (!searchQuery.raw && !searchQuery.compact) {
         return 0;
       }
 
-      const query = searchText.trim().toLowerCase();
-      const title = recipe.name.toLowerCase();
-      const country = recipe.country.toLowerCase();
-      const summary = recipe.summary.toLowerCase();
-      const ingredients = recipe.ingredients.join(" ").toLowerCase();
-      const spices = recipe.spices.join(" ").toLowerCase();
-      const steps = recipe.steps.join(" ").toLowerCase();
+      const aliases = getRecipeAliases(recipe).join(" ");
+      const ingredients = recipe.ingredients.join(" ");
+      const spices = recipe.spices.join(" ");
+      const steps = recipe.steps.join(" ");
       let score = 0;
 
-      if (title === query) {
+      if (valueEqualsSearch(recipe.name, searchQuery)) {
         score += 200;
       }
 
-      if (title.startsWith(query)) {
+      if (valueStartsWithSearch(recipe.name, searchQuery)) {
         score += 120;
       }
 
-      if (title.includes(query)) {
+      if (valueIncludesSearch(recipe.name, searchQuery)) {
         score += 90;
       }
 
-      if (country.includes(query)) {
+      if (valueEqualsSearch(aliases, searchQuery)) {
+        score += 140;
+      }
+
+      if (valueIncludesSearch(aliases, searchQuery)) {
+        score += 75;
+      }
+
+      if (valueIncludesSearch(recipe.country, searchQuery)) {
         score += 55;
       }
 
-      if (ingredients.includes(query)) {
+      if (valueIncludesSearch(ingredients, searchQuery)) {
         score += 45;
       }
 
-      if (spices.includes(query)) {
+      if (valueIncludesSearch(spices, searchQuery)) {
         score += 30;
       }
 
-      if (summary.includes(query)) {
+      if (valueIncludesSearch(recipe.summary, searchQuery)) {
         score += 24;
       }
 
-      if (steps.includes(query)) {
+      if (valueIncludesSearch(steps, searchQuery)) {
         score += 12;
       }
 
@@ -3248,9 +5135,15 @@
       cards.forEach(card => observer.observe(card));
     }
 
-    function openRecipePage(index, skipLock = false) {
+    function openRecipePage(index, skipLock = false, scrollPosition = null) {
       if (!skipLock && ignoreFastDoubleClick(`recipe-${index}`)) {
         return;
+      }
+
+      if (activeDetailView && activeDetailView.type !== "recipe") {
+        detailReturnView = { ...activeDetailView };
+      } else if (!activeDetailView) {
+        detailReturnView = null;
       }
 
       activeDetailView = { type: "recipe", index };
@@ -3260,7 +5153,7 @@
       detailPage.innerHTML = `
         <button class="back-btn" onclick="closeRecipePage()">${t("back")}</button>
         <section class="detail-hero">
-          <img src="${recipe.image}" alt="${getRecipeTitle(recipe)}" title="${getRecipeTitle(recipe)}" onerror="showImageFallback(this)">
+          <img src="${getRecipeImage(recipe)}" alt="${getRecipeTitle(recipe)}" title="${getRecipeTitle(recipe)}" onerror="showImageFallback(this)">
           <div class="detail-intro">
             <h2>${getRecipeTitle(recipe)}</h2>
             <p class="summary">${recipe.summary}</p>
@@ -3276,20 +5169,21 @@
         <section class="detail-grid">
           <article class="detail-card">
             <h3>&#129530; ${t("ingredients")}</h3>
-            <ul>${recipe.ingredients.map(item => `<li>${item}</li>`).join("")}</ul>
+            <ul id="detailIngredientsList">${recipe.ingredients.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
           </article>
           <article class="detail-card">
             <h3>&#129474; ${t("spices")}</h3>
-            <ul>${recipe.spices.map(item => `<li>${item}</li>`).join("")}</ul>
+            <ul id="detailSpicesList">${recipe.spices.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
           </article>
           <article class="detail-card">
             <h3>&#128104;&#8205;&#127859; ${t("steps")}</h3>
-            <ol>${recipe.steps.slice(0, 15).map(step => `<li>${step}</li>`).join("")}</ol>
+            <ol id="detailStepsList">${recipe.steps.map(step => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
           </article>
         </section>
       `;
 
-      showDetailPage();
+      showDetailPage(scrollPosition);
+      localizeRecipeDetailContent(recipe);
     }
 
     function closeRecipePage() {
@@ -3297,7 +5191,21 @@
         return;
       }
 
+      if (detailReturnView) {
+        const returnView = { ...detailReturnView };
+        detailReturnView = null;
+
+        if (returnView.type === "group") {
+          openRecipeGroupPage(returnView.groupKey, true);
+        } else {
+          openCollection(returnView.type, returnView.index, true);
+        }
+
+        return;
+      }
+
       activeDetailView = null;
+      detailReturnView = null;
       document.body.classList.remove("detail-open");
       document.getElementById("topTools").classList.remove("hidden");
       document.querySelector(".dark-toggle").classList.remove("hidden");
@@ -3346,6 +5254,9 @@
       });
 
       btn.classList.add("active");
+      document.querySelectorAll(".extra-filter").forEach(chip => {
+        chip.classList.toggle("is-collapsed", !filtersExpanded && !chip.classList.contains("active"));
+      });
       updateRecipes();
       scrollToRecipeResults();
     }
@@ -3373,56 +5284,7 @@
     }
 
     function updateRecipes() {
-      const container = document.getElementById("recipes");
-      const searchText = document.getElementById("search").value.toLowerCase();
-      let visibleCount = 0;
-      const rankedCards = [];
-      const hiddenCards = [];
-
-      document.querySelectorAll(".recipe").forEach(card => {
-        const index = Number(card.dataset.recipeIndex);
-        const recipe = recipes[index];
-        const searchableText = buildSearchableText(recipe);
-        const score = getSearchScore(recipe, searchText);
-
-        const matchesFilter = currentFilter === "all" || card.classList.contains(currentFilter);
-        const matchesSearch = searchableText.includes(searchText);
-        const shouldShow = matchesFilter && matchesSearch;
-
-        card.classList.toggle("hidden", !shouldShow);
-        card.classList.remove("search-top-match");
-
-        if (shouldShow) {
-          visibleCount++;
-          rankedCards.push({ card, index, score });
-        } else {
-          hiddenCards.push({ card, index });
-        }
-      });
-
-      rankedCards.sort((left, right) => {
-        if (searchText && right.score !== left.score) {
-          return right.score - left.score;
-        }
-
-        return left.index - right.index;
-      });
-
-      hiddenCards.sort((left, right) => left.index - right.index);
-
-      rankedCards.forEach((item, position) => {
-        if (searchText && position < 3) {
-          item.card.classList.add("search-top-match");
-        }
-
-        container.appendChild(item.card);
-      });
-
-      hiddenCards.forEach(item => {
-        container.appendChild(item.card);
-      });
-
-      document.getElementById("stats").textContent = t("statsShown", { visible: visibleCount, total: recipes.length });
+      renderRecipes();
     }
 
     function changeLanguage() {
@@ -3430,12 +5292,15 @@
       refreshStaticText();
       updateAuthUI();
       renderQuickCollections();
+      renderMenuCollections();
       renderMealLists();
       renderRecipes();
 
       if (activeDetailView) {
         if (activeDetailView.type === "recipe") {
           openRecipePage(activeDetailView.index, true);
+        } else if (activeDetailView.type === "group") {
+          openRecipeGroupPage(activeDetailView.groupKey, true);
         } else {
           openCollection(activeDetailView.type, activeDetailView.index, true);
         }
@@ -3448,12 +5313,15 @@
 
     async function initializeApp() {
       document.getElementById("languageSelect").value = currentLanguage;
+      document.getElementById("menuLanguageSelect").value = currentLanguage;
       enhanceControlsLayout();
       switchAuthMode("login");
-      currentUser = await backendApi.getSession();
+      currentUser = applyProfileOverrides(await backendApi.getSession());
+      persistCurrentUser();
       refreshStaticText();
       updateAuthUI();
       renderQuickCollections();
+      renderMenuCollections();
       renderMealLists();
       renderRecipes();
 
@@ -3465,6 +5333,12 @@
     document.getElementById("authModal").addEventListener("click", event => {
       if (event.target.id === "authModal") {
         closeAuthModal();
+      }
+    });
+
+    document.getElementById("profileModal").addEventListener("click", event => {
+      if (event.target.id === "profileModal") {
+        closeProfileModal();
       }
     });
 
