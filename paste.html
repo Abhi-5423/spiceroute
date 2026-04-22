@@ -3059,7 +3059,7 @@
         protein,
         meal,
         category,
-        image: `https://source.unsplash.com/800x600/?${encodeURIComponent(cleanImageName)},food`,
+        image: "",
         summary: isDrink
           ? `${name} served as a refreshing drink option.`
           : `${name} prepared with homestyle spices and a practical step-by-step method.`,
@@ -3839,22 +3839,79 @@
       return `${recipe.emoji ? `${recipe.emoji} ` : ""}${recipe.name}`;
     }
 
+    function createFoodCardImage(label, accentA = "#c75b2c", accentB = "#8f3411", emoji = "🍽️") {
+      const safeLabel = escapeHtml(label || "SpiceRoute");
+      const safeEmoji = escapeHtml(emoji || "🍽️");
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+          <defs>
+            <linearGradient id="cardBg" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="${accentA}"/>
+              <stop offset="1" stop-color="${accentB}"/>
+            </linearGradient>
+            <linearGradient id="plateGlow" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="rgba(255,255,255,0.92)"/>
+              <stop offset="1" stop-color="rgba(255,244,232,0.72)"/>
+            </linearGradient>
+          </defs>
+          <rect width="800" height="600" rx="40" fill="url(#cardBg)"/>
+          <circle cx="645" cy="110" r="88" fill="rgba(255,211,142,0.36)"/>
+          <circle cx="640" cy="118" r="54" fill="rgba(255,242,214,0.5)"/>
+          <rect x="72" y="82" width="656" height="436" rx="30" fill="rgba(23,15,11,0.18)" stroke="rgba(255,255,255,0.14)"/>
+          <circle cx="400" cy="282" r="134" fill="url(#plateGlow)" opacity="0.95"/>
+          <circle cx="400" cy="282" r="106" fill="rgba(255,255,255,0.24)" stroke="rgba(255,255,255,0.34)" stroke-width="8"/>
+          <text x="400" y="310" text-anchor="middle" font-size="112">${safeEmoji}</text>
+          <text x="400" y="468" text-anchor="middle" font-family="Trebuchet MS, Segoe UI, Arial, sans-serif" font-size="38" font-weight="700" fill="#fff">${safeLabel}</text>
+          <text x="400" y="514" text-anchor="middle" font-family="Trebuchet MS, Segoe UI, Arial, sans-serif" font-size="22" fill="rgba(255,245,239,0.88)">SpiceRoute Recipe Studio</text>
+        </svg>
+      `;
+
+      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+    }
+
+    function isDeprecatedRemoteImage(url) {
+      return typeof url === "string" && url.includes("source.unsplash.com");
+    }
+
+    function getRecipeImageAccent(recipe) {
+      if (recipe.category === "drink") {
+        return ["#0d9488", "#155e75", recipe.emoji || "🥤"];
+      }
+
+      if (recipe.category === "colddrink") {
+        return ["#2563eb", "#1d4ed8", recipe.emoji || "🧊"];
+      }
+
+      if (recipe.type === "veg") {
+        return ["#4f8f52", "#2f6f46", recipe.emoji || "🥗"];
+      }
+
+      return ["#c75b2c", "#8f3411", recipe.emoji || "🍲"];
+    }
+
     function getRecipeImage(recipe) {
-      return recipe.image || `https://source.unsplash.com/800x600/?${encodeURIComponent(`${recipe.name},${recipe.country},food`)}`;
+      const [accentA, accentB, emoji] = getRecipeImageAccent(recipe);
+
+      if (recipe.image && !isDeprecatedRemoteImage(recipe.image)) {
+        return recipe.image;
+      }
+
+      return createFoodCardImage(recipe.name, accentA, accentB, emoji);
     }
 
     function getGroupCardImage(groupKey, title = "") {
-      const queries = {
-        veg: "vegetarian indian curry platter",
-        nonveg: "chicken curry grilled meat platter",
-        drink: "fresh juice smoothie drinks",
-        colddrink: "cold drink soda ice glass",
-        breakfast: "indian breakfast dosa poha idli",
-        lunch: "indian lunch thali meal",
-        dinner: "indian dinner curry rice"
+      const themes = {
+        veg: ["#4f8f52", "#2f6f46", "🥗"],
+        nonveg: ["#c75b2c", "#8f3411", "🍗"],
+        drink: ["#0d9488", "#155e75", "🧃"],
+        colddrink: ["#2563eb", "#1d4ed8", "🥤"],
+        breakfast: ["#d59c2b", "#915c16", "🍳"],
+        lunch: ["#5aa469", "#28643b", "🍛"],
+        dinner: ["#5a81d8", "#2f4f82", "🍽️"]
       };
+      const [accentA, accentB, emoji] = themes[groupKey] || ["#c75b2c", "#8f3411", "🍽️"];
 
-      return `https://source.unsplash.com/900x650/?${encodeURIComponent(queries[groupKey] || `${title},food`)}`;
+      return createFoodCardImage(title || "SpiceRoute", accentA, accentB, emoji);
     }
 
     function getTypeLabel(recipe) {
@@ -4702,7 +4759,7 @@
       detailPage.innerHTML = `
         <button class="back-btn" onclick="closeRecipePage()">${t("back")}</button>
         <section class="detail-hero">
-          <img src="https://source.unsplash.com/900x650/?${encodeURIComponent(collection.title)},food" alt="${collection.title}" onerror="showImageFallback(this)">
+          <img src="${createFoodCardImage(collection.title, "#c75b2c", "#8f3411", "🍽️")}" alt="${collection.title}" onerror="showImageFallback(this)">
           <div class="detail-intro">
             <h2>${label} ${collection.title}</h2>
             <p class="summary">${collection.subtitle}</p>
