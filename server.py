@@ -196,6 +196,40 @@ def find_user_by_email(email: str) -> Optional[dict]:
     return {"name": row[0], "email": row[1], "password_hash": row[2]}
 
 
+def update_user_password(email: str, password_hash: str) -> Optional[dict]:
+    normalized_email = normalize_email(email)
+
+    if using_mongodb():
+      result = mongo_db.users.update_one(
+          {"email": normalized_email},
+          {"$set": {"password_hash": password_hash}},
+      )
+      if not result.matched_count:
+          return None
+      user = mongo_db.users.find_one({"email": normalized_email})
+      return {"name": user["name"], "email": user["email"]}
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.execute(
+            "UPDATE users SET password_hash = ? WHERE email = ?",
+            (password_hash, normalized_email),
+        )
+        connection.commit()
+
+        if cursor.rowcount == 0:
+            return None
+
+        row = connection.execute(
+            "SELECT name, email FROM users WHERE email = ?",
+            (normalized_email,),
+        ).fetchone()
+
+    if not row:
+        return None
+
+    return {"name": row[0], "email": row[1]}
+
+
 def get_client_key(ip_address: str, email: str) -> str:
     return f"{ip_address}:{normalize_email(email)}"
 
@@ -313,6 +347,10 @@ class SpiceRouteHandler(SimpleHTTPRequestHandler):
 
         if parsed.path == "/api/logout":
             self.handle_logout()
+            return
+
+        if parsed.path == "/api/reset-password":
+            self.handle_reset_password()
             return
 
         self.send_json({"error": "Not found."}, status=HTTPStatus.NOT_FOUND)
@@ -479,6 +517,38 @@ class SpiceRouteHandler(SimpleHTTPRequestHandler):
             {"ok": True},
             headers={"Set-Cookie": self.build_logout_cookie()},
         )
+
+    def handle_reset_password(self) -> None:
+        try:
+            _, email, password = self.parse_auth_payload()
+        except ValueError as error:
+            self.send_json({"error": str(error)}, status=HTTPStatus.BAD_REQUEST)
+            return
+
+        client_key = self.get_client_identity(email)
+        if is_rate_limited(client_key):
+            self.send_json({"error": "Too many attempts. Please wait a few minutes."}, status=HTTPStatus.TOO_MANY_REQUESTS)
+            return
+
+        if not email or not password:
+            record_failed_attempt(client_key)
+            self.send_json({"error": "Email and new password are required."}, status=HTTPStatus.BAD_REQUEST)
+            return
+
+        password_error = validate_password(password)
+        if password_error:
+            record_failed_attempt(client_key)
+            self.send_json({"error": password_error}, status=HTTPStatus.BAD_REQUEST)
+            return
+
+        user = update_user_password(email, hash_password(password))
+        if not user:
+            record_failed_attempt(client_key)
+            self.send_json({"error": "No account found for this email."}, status=HTTPStatus.NOT_FOUND)
+            return
+
+        clear_failed_attempts(client_key)
+        self.send_json({"ok": True, "message": "Password updated successfully."})
 
 
 def main() -> None:

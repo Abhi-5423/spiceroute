@@ -636,6 +636,18 @@
     .recipe-option {
       width: 100%;
       min-height: 100%;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .recipe-option:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 36px rgba(120, 61, 29, 0.16);
+    }
+
+    .recipe-option:focus-visible {
+      outline: 3px solid rgba(199, 91, 44, 0.32);
+      outline-offset: 4px;
     }
 
     .recipe-card-footer {
@@ -1206,6 +1218,39 @@
       gap: 14px;
     }
 
+    .auth-helper-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: -4px;
+    }
+
+    .auth-link-btn {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--accent-deep);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .auth-link-btn:hover {
+      color: var(--accent);
+    }
+
+    .auth-help-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
     .auth-form label {
       display: grid;
       gap: 7px;
@@ -1329,8 +1374,9 @@
 
     .auth-status {
       display: grid;
-      gap: 4px;
-      padding: 12px 16px;
+      gap: 3px;
+      min-width: 220px;
+      padding: 10px 14px;
       border-radius: 18px;
       background: rgba(255, 255, 255, 0.78);
       box-shadow: 0 10px 24px rgba(102, 53, 28, 0.08);
@@ -1339,11 +1385,11 @@
 
     .auth-status span {
       color: var(--muted);
-      font-size: 14px;
+      font-size: 12px;
     }
 
     .auth-status strong {
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1.2;
     }
 
@@ -1361,14 +1407,21 @@
 
     .menu-corner {
       flex: 0 0 auto;
-      width: min(360px, 100%);
+      width: min(220px, 100%);
       margin-right: auto;
+    }
+
+    .menu-stack {
+      display: grid;
+      justify-items: start;
+      gap: 8px;
     }
 
     .menu-panel {
       position: relative;
-      width: min(360px, 100%);
-      border-radius: 16px;
+      width: min(190px, 100%);
+      border-radius: 20px;
+      border: 1px solid rgba(199, 91, 44, 0.18);
       background: var(--surface-strong);
       box-shadow: 0 12px 30px rgba(68, 36, 22, 0.2);
     }
@@ -1378,13 +1431,20 @@
     }
 
     .menu-panel summary {
-      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 12px;
       cursor: pointer;
       color: #fff;
       font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       list-style: none;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #31231e, var(--accent));
+      border-radius: 19px;
+      background: linear-gradient(135deg, #2f1f18, var(--accent), #e58b4e);
     }
 
     .menu-panel summary::-webkit-details-marker {
@@ -1398,7 +1458,7 @@
       z-index: 70;
       display: grid;
       gap: 12px;
-      width: min(360px, calc(100vw - 28px));
+      width: min(320px, calc(100vw - 28px));
       max-height: 72vh;
       overflow-y: auto;
       padding: 12px;
@@ -1416,6 +1476,14 @@
     .menu-block {
       display: grid;
       gap: 8px;
+    }
+
+    .menu-login-floating {
+      padding: 8px 12px;
+      min-height: 0;
+      border-radius: 999px;
+      font-size: 12px;
+      box-shadow: 0 10px 22px rgba(199, 91, 44, 0.18);
     }
 
     .menu-block h3 {
@@ -1588,10 +1656,10 @@
       z-index: 35;
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      align-items: flex-start;
+      gap: 12px;
+      align-items: center;
       justify-content: space-between;
-      padding: 14px 18px;
+      padding: 12px 18px;
       background: rgba(255, 249, 244, 0.78);
       backdrop-filter: blur(8px);
       animation: fadeSlideUp 0.5s ease both;
@@ -1613,8 +1681,109 @@
     }
 
     .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
       margin-left: auto;
       justify-content: flex-end;
+    }
+
+    .controls {
+      top: 10px;
+      margin: 0 18px 16px;
+      padding: 12px 14px;
+      border: 1px solid rgba(199, 91, 44, 0.12);
+      border-radius: 22px;
+      justify-content: flex-start;
+    }
+
+    .search-wrap {
+      width: min(360px, 100%);
+    }
+
+    .search-wrap input {
+      min-height: 44px;
+      font-size: 14px;
+    }
+
+    .filters-bar {
+      gap: 7px;
+      justify-content: flex-start;
+    }
+
+    .filter-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(199, 91, 44, 0.14), rgba(229, 139, 78, 0.18));
+      color: var(--accent-deep);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    body.dark .filter-label {
+      color: #ffd2bd;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .chip {
+      padding: 8px 11px;
+      font-size: 12px;
+      box-shadow: 0 8px 18px rgba(199, 91, 44, 0.1);
+    }
+
+    .recipe-count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(199, 91, 44, 0.08);
+      color: var(--accent-deep);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    body.dark .recipe-count-badge {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffd2bd;
+    }
+
+    .thanks-card .recipe-main-head {
+      background: linear-gradient(135deg, #9a3412, #ea580c, #f59e0b);
+    }
+
+    .thanks-card .results-empty {
+      display: grid;
+      gap: 10px;
+      padding: 18px 16px 20px;
+    }
+
+    .thanks-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .thanks-emoji-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .thanks-emoji-row span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(199, 91, 44, 0.08);
+      font-size: 20px;
     }
 
     @media (max-width: 760px) {
@@ -1673,12 +1842,19 @@
         width: 100%;
       }
 
+      .menu-stack,
+      .menu-login-floating {
+        width: 100%;
+      }
+
       .menu-content {
         width: 100%;
         max-height: min(70vh, 520px);
       }
 
       .controls {
+        margin-left: 14px;
+        margin-right: 14px;
         gap: 10px;
       }
 
@@ -1828,6 +2004,15 @@
             </button>
           </div>
         </label>
+        <label class="hidden" id="authConfirmWrap">
+          <span id="authConfirmPasswordLabel">Confirm Password</span>
+          <input type="password" id="authConfirmPassword" placeholder="Confirm new password" autocomplete="new-password">
+        </label>
+        <div class="auth-helper-row">
+          <button class="auth-link-btn" type="button" id="forgotPasswordButton" onclick="switchAuthMode('reset')">Forgot Password?</button>
+          <button class="auth-link-btn hidden" type="button" id="backToLoginButton" onclick="switchAuthMode('login')">Back to Login</button>
+          <p class="auth-help-copy" id="authHelperText">Use your email and password to continue.</p>
+        </div>
         <div class="auth-actions">
           <button class="top-btn" type="submit" id="authSubmit">Login</button>
           <button class="top-btn auth-close" type="button" id="authCloseButton" onclick="closeAuthModal()">Close</button>
@@ -1877,62 +2062,73 @@
 
   <div class="top-tools" id="topTools">
     <div class="menu-corner">
-      <details class="menu-panel" id="mainMenu">
-        <summary id="menuSummary">Menu</summary>
-        <div class="menu-content">
-          <div class="menu-block">
-            <details class="menu-nested" id="menuStatePanel">
-              <summary id="menuStateHeading">State</summary>
-              <div class="menu-grid" id="menuStateList"></div>
-            </details>
-          </div>
-          <div class="menu-block">
-            <details class="menu-nested" id="menuCountryPanel">
-              <summary id="menuCountryHeading">Country</summary>
-              <div class="menu-grid" id="menuCountryList"></div>
-            </details>
-          </div>
-          <div class="menu-block">
-            <h3 id="menuLanguageHeading">Language Changer</h3>
-            <select class="menu-select" id="menuLanguageSelect" onchange="syncMenuLanguage()">
-              <option value="en">English</option>
-              <option value="hi">Hindi</option>
-              <option value="gu">Gujarati</option>
-              <option value="mr">Marathi</option>
-              <option value="te">Telugu</option>
-              <option value="bn">Bengali</option>
-              <option value="bho">Bhojpuri</option>
-            </select>
-          </div>
-          <div class="menu-block">
-            <h3 id="menuRatingHeading">Rating</h3>
-            <div class="rating-row">
-              <button class="quick-item" type="button" onclick="setSiteRating(3)">3 Star</button>
-              <button class="quick-item" type="button" onclick="setSiteRating(4)">4 Star</button>
-              <button class="quick-item" type="button" onclick="setSiteRating(5)">5 Star</button>
+      <div class="menu-stack">
+        <details class="menu-panel" id="mainMenu">
+          <summary id="menuSummary">Menu</summary>
+          <div class="menu-content">
+            <div class="menu-block">
+              <details class="menu-nested" id="menuStatePanel">
+                <summary id="menuStateHeading">State</summary>
+                <div class="menu-grid" id="menuStateList"></div>
+              </details>
             </div>
-            <span id="ratingStatus" class="summary">No rating selected.</span>
-          </div>
-          <div class="menu-block">
-            <h3 id="menuLoginHeading">Login / Signup</h3>
-            <button class="top-btn btn-inline" id="menuLoginButton" type="button" onclick="openAuthModal()">
-              <span class="btn-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
-                </svg>
-              </span>
-              <span id="menuLoginButtonText">Login / Signup</span>
-            </button>
-          </div>
-          <div class="menu-block hidden" id="menuProfileBlock">
-            <h3 id="menuProfileHeading">Profile Options</h3>
-            <div class="menu-action-list">
-              <button class="quick-item" id="menuEditProfileButton" type="button" onclick="openProfileModal()">Edit Profile</button>
-              <button class="quick-item" id="menuLogoutButton" type="button" onclick="logoutUser()">Logout</button>
+            <div class="menu-block">
+              <details class="menu-nested" id="menuCountryPanel">
+                <summary id="menuCountryHeading">Country</summary>
+                <div class="menu-grid" id="menuCountryList"></div>
+              </details>
+            </div>
+            <div class="menu-block">
+              <h3 id="menuLanguageHeading">Language Changer</h3>
+              <select class="menu-select" id="menuLanguageSelect" onchange="syncMenuLanguage()">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="gu">Gujarati</option>
+                <option value="mr">Marathi</option>
+                <option value="te">Telugu</option>
+                <option value="bn">Bengali</option>
+                <option value="bho">Bhojpuri</option>
+              </select>
+            </div>
+            <div class="menu-block">
+              <h3 id="menuRatingHeading">Rating</h3>
+              <div class="rating-row">
+                <button class="quick-item" type="button" onclick="setSiteRating(3)">3 Star</button>
+                <button class="quick-item" type="button" onclick="setSiteRating(4)">4 Star</button>
+                <button class="quick-item" type="button" onclick="setSiteRating(5)">5 Star</button>
+              </div>
+              <span id="ratingStatus" class="summary">No rating selected.</span>
+            </div>
+            <div class="menu-block">
+              <h3 id="menuLoginHeading">Login / Signup</h3>
+              <button class="top-btn btn-inline" id="menuLoginButton" type="button" onclick="openAuthModal()">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+                  </svg>
+                </span>
+                <span id="menuLoginButtonText">Login / Signup</span>
+              </button>
+            </div>
+            <div class="menu-block hidden" id="menuProfileBlock">
+              <h3 id="menuProfileHeading">Profile Options</h3>
+              <div class="menu-action-list">
+                <button class="quick-item" id="menuEditProfileButton" type="button" onclick="openProfileModal()">Edit Profile</button>
+                <button class="quick-item" id="menuLogoutButton" type="button" onclick="logoutUser()">Logout</button>
+              </div>
             </div>
           </div>
-        </div>
-      </details>
+        </details>
+
+        <button class="top-btn btn-inline menu-login-floating" id="authOpenButton" type="button" onclick="openAuthModal()">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+            </svg>
+          </span>
+          <span id="authOpenButtonText">Login / Signup</span>
+        </button>
+      </div>
     </div>
 
     <div class="auth-status">
@@ -1941,14 +2137,6 @@
     </div>
 
     <div class="toolbar-group">
-      <button class="top-btn btn-inline" id="authOpenButton" type="button" onclick="openAuthModal()">
-        <span class="btn-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
-          </svg>
-        </span>
-        <span id="authOpenButtonText">Login / Signup</span>
-      </button>
       <button class="top-btn hidden" id="logoutButton" type="button" onclick="logoutUser()">Logout</button>
       <button class="dark-toggle" id="darkToggle" type="button" onclick="toggleDark()">Dark Mode</button>
 
@@ -2994,37 +3182,298 @@
       });
     }
 
+    function uniqueRecipeList(items, limit = 16) {
+      const seen = new Set();
+      const results = [];
+
+      items.forEach(item => {
+        const value = String(item || "").trim();
+        const key = normalizeLookupValue(value);
+
+        if (!value || !key || seen.has(key) || results.length >= limit) {
+          return;
+        }
+
+        seen.add(key);
+        results.push(value);
+      });
+
+      return results;
+    }
+
+    function inferRecipeGroup(recipe) {
+      if (recipe.category === "drink") {
+        return "drink";
+      }
+
+      if (recipe.category === "colddrink") {
+        return "colddrink";
+      }
+
+      if (recipe.protein) {
+        return recipe.protein;
+      }
+
+      return recipe.type === "nonveg" ? "chicken" : "veg";
+    }
+
+    function createRecipeBlueprint(summary, ingredients, spices, steps) {
+      return { summary, ingredients, spices, steps };
+    }
+
+    function getRecipeBlueprint(name, group) {
+      const lowerName = name.toLowerCase();
+      const isDrink = group === "drink";
+      const isColdDrink = group === "colddrink";
+      const isBeverage = isDrink || isColdDrink;
+
+      if (isColdDrink) {
+        if (/(lemon|7up|sprite|limca)/.test(lowerName)) {
+          return createRecipeBlueprint(
+            `${name} served ice-cold with citrus fizz and a clean, refreshing finish.`,
+            ["Chilled soft drink", "Ice cubes", "Lemon slice", "Mint leaves"],
+            ["Black salt", "Roasted cumin powder"],
+            ["Chill the glass for a few minutes before serving.", "Fill the glass with ice cubes.", "Pour the cold drink slowly to keep the fizz lively.", "Add a squeeze of lemon if desired.", "Finish with mint or a lemon slice.", "Serve immediately while bubbly."]
+          );
+        }
+
+        return createRecipeBlueprint(
+          `${name} poured extra cold for a crisp fizzy sip.`,
+          ["Chilled soft drink", "Ice cubes", "Lemon wedge"],
+          ["Black salt"],
+          ["Use a chilled glass for the cleanest taste.", "Add a few ice cubes.", "Pour the soft drink slowly to avoid overflow.", "Add lemon only if you want a sharper finish.", "Serve right away before the fizz softens."]
+        );
+      }
+
+      if (isDrink) {
+        if (/(tea|green tea)/.test(lowerName)) {
+          return createRecipeBlueprint(
+            `${name} brewed fresh so the aroma stays bright and balanced.`,
+            ["Water", lowerName.includes("green") ? "Green tea leaves or tea bag" : "Tea leaves", "Sugar or honey", "Milk for regular tea"],
+            lowerName.includes("green") ? ["Lemon juice", "Honey"] : ["Cardamom", "Ginger", "Clove"],
+            lowerName.includes("green")
+              ? ["Boil water gently and switch off the heat.", "Steep green tea for 2 to 3 minutes without over-brewing.", "Add honey or lemon after steeping.", "Strain into a cup and serve warm."]
+              : ["Boil water with ginger or cardamom if using.", "Add tea leaves and let them bloom briefly.", "Pour in milk and add sugar to taste.", "Simmer until the tea looks rich and aromatic.", "Strain into cups and serve hot."]
+          );
+        }
+
+        if (/(lassi|buttermilk)/.test(lowerName)) {
+          return createRecipeBlueprint(
+            `${name} blended until smooth and cooling, ideal for a hot day.`,
+            ["Curd", "Chilled water", "Sugar for sweet style", "Ice cubes"],
+            ["Roasted cumin powder", "Black salt", "Cardamom powder"],
+            ["Whisk curd until smooth.", "Add chilled water little by little.", "Choose either sugar for sweet style or black salt and cumin for salted style.", "Blend until frothy.", "Pour into a chilled glass and serve immediately."]
+          );
+        }
+
+        if (/(coconut water)/.test(lowerName)) {
+          return createRecipeBlueprint(
+            "Fresh coconut water served naturally chilled for a clean and light drink.",
+            ["Tender coconut water", "Soft malai or coconut flesh", "Ice cubes"],
+            ["Mint leaves", "Black salt"],
+            ["Crack open a tender coconut carefully.", "Pour the coconut water into a chilled glass.", "Add soft malai pieces if desired.", "Finish with a mint leaf and serve cold."]
+          );
+        }
+
+        if (/(banana shake|mango shake|fresh juice|lemon juice|sattu)/.test(lowerName)) {
+          const mainBase = /(banana)/.test(lowerName)
+            ? ["Ripe banana", "Cold milk", "Sugar or honey", "Ice cubes"]
+            : /(mango)/.test(lowerName)
+              ? ["Ripe mango", "Cold milk", "Sugar", "Ice cubes"]
+              : /(lemon)/.test(lowerName)
+                ? ["Fresh lemon juice", "Cold water", "Sugar", "Ice cubes"]
+                : /(sattu)/.test(lowerName)
+                  ? ["Sattu", "Cold water", "Lemon juice", "Sugar or jaggery"]
+                  : ["Fresh fruit pieces", "Chilled water", "Sugar or honey", "Ice cubes"];
+          const seasoning = /(lemon|sattu)/.test(lowerName)
+            ? ["Black salt", "Roasted cumin powder", "Mint"]
+            : ["Cardamom powder", "Chia seeds", "Mint"];
+
+          return createRecipeBlueprint(
+            `${name} blended fresh with balanced sweetness and a bright finish.`,
+            mainBase,
+            seasoning,
+            ["Prep the fruit or main drink ingredient first.", "Add the base ingredients to a blender or shaker.", "Blend until smooth and taste for sweetness or tang.", "Add ice and blend once more if you want it colder.", "Pour into a chilled glass and garnish before serving."]
+          );
+        }
+      }
+
+      if (/(paneer butter masala|shahi paneer|kadai paneer|matar paneer|palak paneer|paneer bhurji)/.test(lowerName)) {
+        const paneerSteps = lowerName.includes("bhurji")
+          ? ["Heat oil or butter in a pan.", "Add cumin, onion, ginger, garlic, and green chilli.", "Cook tomato until soft and glossy.", "Mix in turmeric, chilli, coriander powder, and salt.", "Crumble paneer directly into the masala.", "Toss on medium heat until the paneer absorbs the spices.", "Finish with garam masala and coriander."]
+          : ["Heat butter or oil and saute onion until light golden.", "Add ginger-garlic paste and cook briefly.", "Add tomato or puree and cook until the masala thickens.", "Mix in turmeric, chilli powder, coriander powder, and salt.", "Add paneer cubes along with a splash of water.", "Simmer gently so the paneer stays soft.", "Finish with cream, kasuri methi, or garam masala as needed."];
+
+        return createRecipeBlueprint(
+          `${name} cooked in a rich masala with paneer staying soft and flavorful.`,
+          ["Paneer", "Onion", "Tomato or tomato puree", "Ginger-garlic paste", "Oil or butter", "Cream or milk", lowerName.includes("palak") ? "Spinach" : "Capsicum or peas as needed"],
+          ["Turmeric", "Red chilli powder", "Coriander powder", "Garam masala", "Kasuri methi", "Salt"],
+          paneerSteps
+        );
+      }
+
+      if (/(dal|rajma|chole|ghugni|kadhi)/.test(lowerName)) {
+        const mainIngredient = lowerName.includes("rajma")
+          ? "Soaked rajma"
+          : lowerName.includes("chole") || lowerName.includes("ghugni")
+            ? "Boiled chickpeas or yellow peas"
+            : lowerName.includes("kadhi")
+              ? "Curd and gram flour"
+              : "Dal or mixed lentils";
+
+        return createRecipeBlueprint(
+          `${name} simmered slowly so the gravy tastes deep, hearty, and well-seasoned.`,
+          [mainIngredient, "Onion", "Tomato", "Ginger-garlic paste", "Oil or ghee", "Fresh coriander"],
+          ["Cumin", "Turmeric", "Red chilli powder", "Coriander powder", "Garam masala", "Salt"],
+          ["Cook or soak the main ingredient until tender.", "Heat oil or ghee and crackle cumin.", "Cook onion until golden, then add ginger-garlic paste.", "Add tomato and cook until the masala turns glossy.", "Stir in the powdered spices and salt.", "Add the cooked lentils or legumes and simmer until the gravy tastes rounded.", "Mash a little if you want a thicker finish.", "Garnish with coriander and serve hot."]
+        );
+      }
+
+      if (/(aloo gobi|mix veg curry|bhindi masala|baingan bharta|stuffed capsicum|aloo chokha)/.test(lowerName)) {
+        const hero = lowerName.includes("bhindi") ? "Bhindi" : lowerName.includes("baingan") ? "Roasted eggplant" : lowerName.includes("capsicum") ? "Capsicum" : lowerName.includes("chokha") ? "Boiled potato" : "Potato and cauliflower";
+
+        return createRecipeBlueprint(
+          `${name} cooked with a home-style masala so the vegetables stay distinct and flavorful.`,
+          [hero, "Onion", "Tomato", "Green chilli", "Oil", "Fresh coriander"],
+          ["Cumin", "Turmeric", "Red chilli powder", "Coriander powder", "Garam masala", "Salt"],
+          ["Prep and cut the vegetables evenly.", "Heat oil and add cumin seeds.", "Cook onion and green chilli until fragrant.", "Add tomato and cook into a soft masala.", "Mix in the powdered spices and salt.", "Add the vegetables and coat them well.", "Cook covered on low heat until tender.", "Finish with coriander and a squeeze of lemon if desired."]
+        );
+      }
+
+      if (/(paratha|naan|roti|puri|kachori|sheermal)/.test(lowerName)) {
+        const flourBase = lowerName.includes("sheermal") ? "Refined flour" : "Wheat flour";
+        const stuffing = lowerName.includes("sattu") ? "Sattu filling" : lowerName.includes("aloo") ? "Spiced potato filling" : "Plain dough or spiced filling";
+
+        return createRecipeBlueprint(
+          `${name} prepared with a soft dough, proper resting time, and a fresh hot finish.`,
+          [flourBase, stuffing, "Salt", "Oil or ghee", "Water or milk"],
+          ["Ajwain", "Cumin", "Black pepper", "Chaat masala"],
+          ["Knead the dough until smooth and let it rest.", "Prepare the filling if the bread is stuffed.", "Divide the dough into even portions.", "Roll each portion gently and add filling where needed.", "Cook on a hot tawa or bake until light brown spots appear.", "Brush with ghee or butter and serve hot."]
+        );
+      }
+
+      if (/(biryani|pulao|fried rice|chawal|rice|lemon rice|curd rice|jeera rice)/.test(lowerName)) {
+        const riceBase = /(fried rice)/.test(lowerName) ? "Cooked cooled rice" : "Basmati or regular rice";
+        const proteinOrVeg = group === "mutton" ? "Mutton" : group === "fish" ? "Fish" : group === "egg" ? "Egg" : group === "chicken" ? "Chicken" : "Mixed vegetables";
+
+        return createRecipeBlueprint(
+          `${name} layered or tossed carefully so every grain stays separate and flavorful.`,
+          [riceBase, proteinOrVeg, "Onion", "Ginger-garlic paste", "Oil or ghee", "Mint or coriander"],
+          ["Cumin", "Bay leaf", "Cardamom", "Cloves", "Cinnamon", "Pepper", "Salt"],
+          ["Wash the rice well and soak it briefly if needed.", "Cook the masala or tempering first.", "Add the main protein or vegetables and cook until nearly done.", "Add rice with measured liquid or use pre-cooked rice for stir-fried versions.", "Season carefully and cook on low heat until the grains are fluffy.", "Rest for a few minutes before serving so the texture settles."]
+        );
+      }
+
+      if (/(idli|dosa|uttapam|upma|poha|omelette|boiled egg)/.test(lowerName)) {
+        const base = lowerName.includes("upma") ? "Roasted semolina" : lowerName.includes("poha") ? "Poha" : lowerName.includes("omelette") || lowerName.includes("egg") ? "Eggs" : "Fermented rice and dal batter";
+        return createRecipeBlueprint(
+          `${name} made for a satisfying breakfast with clear seasoning and good texture.`,
+          [base, "Onion", "Green chilli", "Oil or ghee", "Curry leaves", "Lemon or coriander"],
+          ["Mustard seeds", "Cumin", "Turmeric", "Black pepper", "Salt"],
+          ["Prep the batter or main breakfast base first.", "Heat oil or ghee and add the tempering ingredients.", "Add onion and chilli and cook until aromatic.", "Finish the dish according to style, steaming, roasting, or scrambling until just done.", "Serve hot with chutney, sambar, toast, or a fresh garnish."]
+        );
+      }
+
+      if (/(tikka|tandoori|65|lollipop|kabab|kebab|shawarma|roll|frankie|sandwich|burger|pizza|momos|manchurian|noodles|chowmein|spring rolls|pakora|cutlet|fingers|fries)/.test(lowerName)) {
+        const hero = group === "chicken" ? "Chicken" : group === "mutton" ? "Mutton" : group === "fish" ? "Fish" : group === "egg" ? "Egg" : lowerName.includes("pizza") ? "Pizza dough and cheese" : lowerName.includes("burger") ? "Burger patty" : lowerName.includes("fries") ? "Potatoes" : "Mixed vegetables";
+        const method = /(pizza|burger|sandwich|roll|shawarma|frankie)/.test(lowerName) ? "assembled" : "cooked";
+
+        return createRecipeBlueprint(
+          `${name} ${method} with bold seasoning, good texture, and a fresh finishing touch.`,
+          [hero, "Onion", "Capsicum or lettuce", "Lemon juice or sauce", "Oil or butter", lowerName.includes("pizza") ? "Mozzarella" : "Fresh herbs"],
+          ["Black pepper", "Red chilli flakes", "Cumin", "Paprika or chilli powder", "Oregano or garam masala", "Salt"],
+          ["Prep the main filling or protein first.", "Season well and marinate briefly if needed.", "Cook on high heat, grill, fry, or roast depending on the dish.", "Warm the bread, wrap, or base separately so it stays pleasant to eat.", "Assemble with fresh vegetables, sauce, and the hot filling.", "Serve immediately while the texture is still at its best."]
+        );
+      }
+
+      if (/(soup|shorba)/.test(lowerName)) {
+        return createRecipeBlueprint(
+          `${name} simmered gently so the broth tastes light but full of flavor.`,
+          ["Stock or water", "Onion", "Garlic", "Main vegetables or protein", "Butter or oil", "Fresh herbs"],
+          ["Black pepper", "Salt", "Chilli flakes", "Mixed herbs"],
+          ["Saute onion and garlic lightly.", "Add the main vegetables or protein and cook briefly.", "Pour in stock and season.", "Simmer until the flavors come together.", "Adjust thickness if needed and serve hot."]
+        );
+      }
+
+      if (/(chaat|bhalla|paan|petha|ladoo)/.test(lowerName)) {
+        const dessertBase = lowerName.includes("petha") ? "Ash gourd" : lowerName.includes("paan") ? "Betel leaves" : lowerName.includes("ladoo") ? "Sattu or gram flour" : "Crisp chaat base";
+        return createRecipeBlueprint(
+          `${name} prepared with the classic balance of sweetness, tang, spice, and texture.`,
+          [dessertBase, "Tamarind chutney", "Green chutney", "Curd where needed", "Fresh garnish"],
+          ["Roasted cumin powder", "Black salt", "Chaat masala", "Cardamom for sweet dishes"],
+          ["Prepare the main base first.", "Add the supporting chutneys, curd, or sweet elements according to the style.", "Finish with spice powders and fresh garnish.", "Serve soon after assembling so the texture stays lively."]
+        );
+      }
+
+      if (group === "mutton" || /(mutton|rogan josh|nihari|haleem)/.test(lowerName)) {
+        return createRecipeBlueprint(
+          `${name} slow-cooked for a deep meaty flavor and tender bite.`,
+          ["Mutton", "Onion", "Curd", "Ginger-garlic paste", "Oil or ghee", "Fresh coriander"],
+          ["Turmeric", "Red chilli powder", "Coriander powder", "Garam masala", "Whole spices", "Salt"],
+          ["Marinate or season the mutton first.", "Brown onion well for a deeper gravy.", "Add ginger-garlic paste and cook off the raw aroma.", "Add curd or tomato and the spice blend.", "Cook the mutton on low heat or under pressure until tender.", "Rest briefly before serving so the gravy settles."]
+        );
+      }
+
+      if (group === "fish" || /(fish|prawn)/.test(lowerName)) {
+        return createRecipeBlueprint(
+          `${name} cooked just until tender so the seafood stays juicy and clean tasting.`,
+          ["Fish or prawns", "Lemon juice", "Onion", "Tomato", "Oil", "Fresh coriander"],
+          ["Turmeric", "Red chilli powder", "Coriander powder", "Black pepper", "Salt"],
+          ["Clean the seafood and pat it dry.", "Season or marinate it lightly.", "Cook the onion-tomato masala or frying batter first.", "Add the seafood and cook only until just done.", "Finish with lemon and coriander before serving."]
+        );
+      }
+
+      if (group === "egg" || /(egg|omelette)/.test(lowerName)) {
+        return createRecipeBlueprint(
+          `${name} prepared with eggs cooked just enough to stay tender and tasty.`,
+          ["Eggs", "Onion", "Tomato", "Green chilli", "Oil or butter", "Fresh coriander"],
+          ["Turmeric", "Black pepper", "Red chilli powder", "Cumin", "Salt"],
+          ["Beat or boil the eggs depending on the dish.", "Cook the aromatics first if making a masala style recipe.", "Add eggs and cook gently so they stay soft.", "Finish with coriander or a touch of butter before serving."]
+        );
+      }
+
+      if (group === "chicken" || /(chicken|butter chicken|korma|curry)/.test(lowerName)) {
+        return createRecipeBlueprint(
+          `${name} cooked in a well-roasted masala so the chicken stays juicy and flavorful.`,
+          ["Chicken", "Onion", "Tomato", "Curd or cream", "Ginger-garlic paste", "Oil or butter", "Fresh coriander"],
+          ["Turmeric", "Red chilli powder", "Coriander powder", "Garam masala", "Black pepper", "Salt"],
+          ["Marinate the chicken with salt and spices if time allows.", "Cook onion until golden and add ginger-garlic paste.", "Add tomato or curd and cook until the masala turns rich.", "Add chicken and sear well on medium-high heat.", "Cover and cook until tender.", "Finish with cream, coriander, or a final spice sprinkle."]
+        );
+      }
+
+      if (isBeverage) {
+        return createRecipeBlueprint(
+          `${name} served fresh with balanced sweetness and clean finishing notes.`,
+          ["Main drink ingredient", "Chilled water or milk", "Sugar or honey", "Ice cubes"],
+          ["Black salt", "Cardamom", "Roasted cumin"],
+          ["Chill all ingredients first.", "Blend or stir until smooth and evenly mixed.", "Taste and adjust sweetness or seasoning.", "Pour into a chilled glass and serve immediately."]
+        );
+      }
+
+      return createRecipeBlueprint(
+        `${name} prepared with practical home-style cooking steps and balanced seasoning.`,
+        ["Main ingredient", "Onion", "Tomato", "Ginger-garlic paste", "Oil or ghee", "Fresh coriander"],
+        ["Turmeric", "Red chilli powder", "Coriander powder", "Garam masala", "Salt"],
+        ["Prep all ingredients before heating the pan.", "Cook the base masala until fragrant and glossy.", "Add the main ingredient and coat it well.", "Cook covered until tender, adjusting texture if needed.", "Finish with fresh garnish and serve hot."]
+      );
+    }
+
     function ensureDetailedRecipes() {
       recipes.forEach(recipe => {
-        const defaultExtraSteps = recipe.category === "drink" || recipe.category === "colddrink"
-          ? [
-              "Taste the drink once before serving and balance sugar, salt, or lemon if needed.",
-              "Strain the drink only if you want a smoother texture.",
-              "Chill the serving glass for a cleaner and fresher finish.",
-              "Garnish with mint, fruit slices, or a light spice sprinkle before serving.",
-              "Serve immediately so the drink keeps its texture and freshness."
-            ]
-          : [
-              "Lower the heat if the masala starts sticking and add a small splash of water.",
-              "Taste the gravy midway and adjust salt, chilli, or tang according to preference.",
-              "Cook covered for a few minutes so the main ingredient absorbs the masala properly.",
-              "Check tenderness before finishing and cook a little longer if required.",
-              "Rest the dish briefly after turning off the heat so the flavors settle well."
-            ];
+        const blueprint = getRecipeBlueprint(recipe.name, inferRecipeGroup(recipe));
+        const summaryLooksGeneric = !recipe.summary || /homestyle spices and a practical step-by-step method|served as a refreshing drink option/i.test(recipe.summary);
 
-        const seenSteps = new Set();
-        const mergedSteps = [...recipe.steps, ...defaultExtraSteps].filter(step => {
-          const key = normalizeLookupValue(step);
+        if (summaryLooksGeneric) {
+          recipe.summary = blueprint.summary;
+        }
 
-          if (!key || seenSteps.has(key)) {
-            return false;
-          }
-
-          seenSteps.add(key);
-          return true;
-        });
-
-        recipe.steps = mergedSteps.slice(0, 12);
+        recipe.ingredients = uniqueRecipeList([...recipe.ingredients, ...blueprint.ingredients], 14);
+        recipe.spices = uniqueRecipeList([...recipe.spices, ...blueprint.spices], 12);
+        recipe.steps = uniqueRecipeList(
+          recipe.steps.length >= blueprint.steps.length
+            ? recipe.steps
+            : [...recipe.steps, ...blueprint.steps],
+          12
+        );
       });
     }
 
@@ -3046,11 +3495,9 @@
       const isDrink = group === "drink" || group === "colddrink";
       const type = group === "chicken" || group === "mutton" || group === "fish" || group === "egg" ? "nonveg" : "veg";
       const meal = guessRecipeMeal(name, group);
-      const cleanImageName = name.replace(/[()]/g, "").replace(/\//g, " ");
       const protein = ["chicken", "mutton", "fish", "egg"].includes(group) ? group : "";
       const category = group === "drink" ? "drink" : group === "colddrink" ? "colddrink" : getGeneratedRecipeCategory(name);
-      const titleWords = name.split(" ");
-      const mainIngredient = protein ? protein : titleWords[0].replace(/[^A-Za-z]/g, "") || "vegetable";
+      const blueprint = getRecipeBlueprint(name, group);
 
       return {
         name,
@@ -3060,42 +3507,10 @@
         meal,
         category,
         image: "",
-        summary: isDrink
-          ? `${name} served as a refreshing drink option.`
-          : `${name} prepared with homestyle spices and a practical step-by-step method.`,
-        ingredients: isDrink
-          ? [name, "Chilled water or milk", "Sugar or honey", "Ice cubes", "Mint or lemon if needed"]
-          : [mainIngredient, "Onion", "Tomato", "Ginger-garlic paste", "Oil or ghee", "Fresh coriander"],
-        spices: isDrink
-          ? ["Black salt", "Cardamom or roasted cumin", "Sugar to taste"]
-          : ["Turmeric", "Red chilli powder", "Coriander powder", "Garam masala", "Salt"],
-        steps: isDrink
-          ? [
-              "Keep all ingredients chilled before starting.",
-              "Wash and prepare any fruit, lemon, mint, or garnish.",
-              "Add the main drink ingredient to a blender or mixing glass.",
-              "Add chilled water or milk according to the drink style.",
-              "Add sugar, honey, or salt in a small amount first.",
-              "Blend or stir until smooth and evenly mixed.",
-              "Taste and adjust sweetness, salt, or lemon.",
-              "Add ice cubes to the serving glass.",
-              "Pour the drink slowly and garnish neatly.",
-              "Serve immediately while cold and fresh."
-            ]
-          : [
-              "Wash and prepare all ingredients before heating the pan.",
-              "Heat oil or ghee on medium flame.",
-              "Add whole spices if using and let them release aroma.",
-              "Cook onion until light golden.",
-              "Add ginger-garlic paste and saute until raw smell reduces.",
-              "Add tomato and cook until soft and glossy.",
-              "Mix in powdered spices and salt.",
-              "Add the main ingredient and coat it well with masala.",
-              "Add a little water, cover, and cook until tender.",
-              "Adjust gravy thickness and finish with coriander.",
-              "Rest for two minutes so flavors settle.",
-              "Serve hot with roti, rice, naan, or chutney."
-            ]
+        summary: blueprint.summary,
+        ingredients: uniqueRecipeList(blueprint.ingredients, 14),
+        spices: uniqueRecipeList(blueprint.spices, 12),
+        steps: uniqueRecipeList(blueprint.steps, 12)
       };
     }
 
@@ -3762,6 +4177,13 @@
         });
       },
 
+      async resetPassword(payload) {
+        return this.request("/reset-password", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+      },
+
       async getSession() {
         try {
           return await this.request("/session");
@@ -4177,11 +4599,6 @@
         return localImagePath;
       }
 
-      const fallbackImagePath = getFallbackRecipeImage(recipe);
-      if (fallbackImagePath) {
-        return fallbackImagePath;
-      }
-
       if (recipe.image && !isDeprecatedRemoteImage(recipe.image)) {
         return recipe.image;
       }
@@ -4577,6 +4994,12 @@
       document.getElementById("menuRatingHeading").textContent = te("menuRatingHeadingText", "Rating");
       document.getElementById("menuLoginHeading").textContent = te("menuLoginHeadingText", "Login / Signup");
       document.getElementById("menuProfileHeading").textContent = te("menuProfileHeadingText", "Profile Options");
+      const filterLabel = document.getElementById("filterLabel");
+
+      if (filterLabel) {
+        filterLabel.textContent = te("filterLabel", "Quick Filters");
+      }
+
       document.getElementById("search").placeholder = t("searchPlaceholder");
       document.getElementById("breakfastHeading").textContent = t("breakfastHeading");
       document.getElementById("lunchHeading").textContent = t("lunchHeading");
@@ -4615,21 +5038,36 @@
         moreButton.textContent = filtersExpanded ? te("lessFilters", "Less Filters") : te("moreFilters", "More Filters");
       }
 
-      document.getElementById("authHeading").textContent = te("authHeading", "Join SpiceRoute");
-      document.getElementById("authIntro").textContent = te("authIntro", "Create an account or log in to keep your session ready on this device.");
+      document.getElementById("authHeading").textContent = getAuthHeadingText(authMode);
+      document.getElementById("authIntro").textContent = getAuthIntroText(authMode);
       document.getElementById("loginTab").textContent = te("loginButton", "Login");
       document.getElementById("signupTab").textContent = te("signupButton", "Signup");
       document.getElementById("authNameLabel").textContent = te("nameLabel", "Full Name");
       document.getElementById("authEmailLabel").textContent = te("emailLabel", "Email");
-      document.getElementById("authPasswordLabel").textContent = te("passwordLabel", "Password");
+      document.getElementById("authPasswordLabel").textContent = authMode === "reset"
+        ? te("newPasswordLabel", "New Password")
+        : te("passwordLabel", "Password");
+      document.getElementById("authConfirmPasswordLabel").textContent = te("confirmPasswordLabel", "Confirm Password");
       document.getElementById("authName").placeholder = te("namePlaceholder", "Enter your name");
       document.getElementById("authEmail").placeholder = te("emailPlaceholder", "Enter your email");
       document.getElementById("authPassword").placeholder = authMode === "signup"
         ? te("passwordCreate", "Create password")
-        : te("passwordEnter", "Enter password");
+        : authMode === "reset"
+          ? te("passwordReset", "Enter new password")
+          : te("passwordEnter", "Enter password");
+      document.getElementById("authConfirmPassword").placeholder = te("confirmPasswordPlaceholder", "Confirm new password");
       document.getElementById("authSubmit").textContent = authMode === "signup"
         ? te("signupButton", "Signup")
-        : te("loginButton", "Login");
+        : authMode === "reset"
+          ? te("resetButton", "Reset Password")
+          : te("loginButton", "Login");
+      document.getElementById("forgotPasswordButton").textContent = te("forgotPasswordButton", "Forgot Password?");
+      document.getElementById("backToLoginButton").textContent = te("backToLoginButton", "Back to Login");
+      document.getElementById("authHelperText").textContent = authMode === "reset"
+        ? te("resetHelper", "Use the same email you signed up with, then set a new password with letters and numbers.")
+        : authMode === "signup"
+          ? te("signupHelper", "Choose a strong password with at least 8 characters, including letters and numbers.")
+          : te("loginHelper", "Use your registered email and password to continue.");
       document.getElementById("authCloseButton").textContent = te("closeButton", "Close");
       document.getElementById("authOpenButtonText").textContent = te("authOpen", "Login / Signup");
       document.getElementById("menuLoginButtonText").textContent = te("authOpen", "Login / Signup");
@@ -4682,6 +5120,7 @@
       const icon = document.createElement("span");
       const clearButton = document.createElement("button");
       const filtersBar = document.createElement("div");
+      const filterLabel = document.createElement("span");
       const moreButton = document.createElement("button");
 
       searchShell.className = "search-shell";
@@ -4700,6 +5139,8 @@
       };
       filtersBar.className = "filters-bar";
       filtersBar.id = "filtersBar";
+      filterLabel.className = "filter-label";
+      filterLabel.id = "filterLabel";
 
       moreButton.className = "chip more-toggle";
       moreButton.id = "moreFiltersButton";
@@ -4716,6 +5157,7 @@
       searchWrap.append(icon, searchInput, clearButton);
       searchShell.appendChild(searchWrap);
       chips.sort((left, right) => filterOrder.indexOf(left.id) - filterOrder.indexOf(right.id));
+      filtersBar.appendChild(filterLabel);
 
       chips.forEach((chip, index) => {
         if (index >= visibleFilterIds.length) {
@@ -4799,6 +5241,30 @@
       node.classList.toggle("error", isError);
     }
 
+    function getAuthHeadingText(mode) {
+      if (mode === "signup") {
+        return te("authHeading", "Join SpiceRoute");
+      }
+
+      if (mode === "reset") {
+        return te("resetHeading", "Reset your password");
+      }
+
+      return te("loginHeading", "Welcome back to SpiceRoute");
+    }
+
+    function getAuthIntroText(mode) {
+      if (mode === "signup") {
+        return te("authIntro", "Create an account or log in to keep your session ready on this device.");
+      }
+
+      if (mode === "reset") {
+        return te("resetIntro", "Enter your account email and choose a new password for this device.");
+      }
+
+      return te("loginIntro", "Log in to save favorites and keep your recipe session ready on this device.");
+    }
+
     function setAuthPasswordVisibility(isVisible) {
       const passwordInput = document.getElementById("authPassword");
       const toggleButton = document.getElementById("passwordToggle");
@@ -4824,17 +5290,38 @@
 
     function switchAuthMode(mode) {
       authMode = mode;
+      const isSignup = mode === "signup";
+      const isReset = mode === "reset";
       document.getElementById("loginTab").classList.toggle("active", mode === "login");
-      document.getElementById("signupTab").classList.toggle("active", mode === "signup");
-      document.getElementById("authName").parentElement.classList.toggle("hidden", mode === "login");
-      document.getElementById("authPassword").setAttribute("autocomplete", mode === "signup" ? "new-password" : "current-password");
+      document.getElementById("signupTab").classList.toggle("active", isSignup);
+      document.getElementById("authHeading").textContent = getAuthHeadingText(mode);
+      document.getElementById("authIntro").textContent = getAuthIntroText(mode);
+      document.getElementById("authName").parentElement.classList.toggle("hidden", !isSignup);
+      document.getElementById("authConfirmWrap").classList.toggle("hidden", !isReset);
+      document.getElementById("forgotPasswordButton").classList.toggle("hidden", mode !== "login");
+      document.getElementById("backToLoginButton").classList.toggle("hidden", !isReset);
+      document.getElementById("authHelperText").textContent = isReset
+        ? te("resetHelper", "Use the same email you signed up with, then set a new password with letters and numbers.")
+        : isSignup
+          ? te("signupHelper", "Choose a strong password with at least 8 characters, including letters and numbers.")
+          : te("loginHelper", "Use your registered email and password to continue.");
+      document.getElementById("authPassword").setAttribute("autocomplete", isSignup || isReset ? "new-password" : "current-password");
       setAuthPasswordVisibility(false);
-      document.getElementById("authSubmit").textContent = mode === "signup"
+      document.getElementById("authSubmit").textContent = isSignup
         ? te("signupButton", "Signup")
-        : te("loginButton", "Login");
-      document.getElementById("authPassword").placeholder = mode === "signup"
+        : isReset
+          ? te("resetButton", "Reset Password")
+          : te("loginButton", "Login");
+      document.getElementById("authPasswordLabel").textContent = isReset
+        ? te("newPasswordLabel", "New Password")
+        : te("passwordLabel", "Password");
+      document.getElementById("authPassword").placeholder = isSignup
         ? te("passwordCreate", "Create password")
-        : te("passwordEnter", "Enter password");
+        : isReset
+          ? te("passwordReset", "Enter new password")
+          : te("passwordEnter", "Enter password");
+      document.getElementById("authConfirmPassword").value = "";
+      document.getElementById("authConfirmPassword").toggleAttribute("required", isReset);
       showAuthMessage("");
     }
 
@@ -4849,6 +5336,7 @@
 
     function closeAuthModal() {
       document.getElementById("authModal").classList.add("hidden");
+      document.getElementById("authConfirmPassword").value = "";
       showAuthMessage("");
     }
 
@@ -4889,6 +5377,7 @@
       const name = document.getElementById("authName").value.trim();
       const email = document.getElementById("authEmail").value.trim();
       const password = document.getElementById("authPassword").value;
+      const confirmPassword = document.getElementById("authConfirmPassword").value;
 
       try {
         if (!email) {
@@ -4908,6 +5397,17 @@
           currentUser = applyProfileOverrides(currentUser);
           persistCurrentUser();
           showAuthMessage(te("signupSuccess", "Account created successfully."));
+        } else if (authMode === "reset") {
+          if (password !== confirmPassword) {
+            throw new Error(te("passwordMismatch", "New password and confirm password do not match."));
+          }
+
+          await backendApi.resetPassword({ email, password });
+          showAuthMessage(te("resetSuccess", "Password updated successfully. You can now log in with your new password."));
+          document.getElementById("authPassword").value = "";
+          document.getElementById("authConfirmPassword").value = "";
+          switchAuthMode("login");
+          return;
         } else {
           currentUser = await backendApi.login({ email, password });
           currentUser = applyProfileOverrides(currentUser);
@@ -5138,9 +5638,35 @@
       `;
     }
 
+    function handleRecipeCardActivate(index, event) {
+      const interactiveTarget = event?.target?.closest?.("button, a, input, select, textarea, label");
+
+      if (interactiveTarget) {
+        return;
+      }
+
+      openRecipePage(index);
+    }
+
+    function handleRecipeCardKeydown(index, event) {
+      if (event.key !== "Enter" && event.key !== " ") {
+        return;
+      }
+
+      event.preventDefault();
+      handleRecipeCardActivate(index, event);
+    }
+
     function renderRecipeOption(item, topMatchIds) {
       return `
-        <article class="recipe recipe-option ${topMatchIds.has(item.index) ? "search-top-match" : ""}">
+        <article
+          class="recipe recipe-option ${topMatchIds.has(item.index) ? "search-top-match" : ""}"
+          role="button"
+          tabindex="0"
+          aria-label="${escapeHtml(getRecipeTitle(item.recipe))}"
+          onclick="handleRecipeCardActivate(${item.index}, event)"
+          onkeydown="handleRecipeCardKeydown(${item.index}, event)"
+        >
           <div class="img-box">
             <img
               src="${getRecipeImage(item.recipe)}"
@@ -5163,6 +5689,8 @@
               ${getCategoryLabel(item.recipe) ? `<span>${getCategoryLabel(item.recipe)}</span>` : ""}
               <span>${getMealLabel(item.recipe.meal)}</span>
               <span>${t("stepsCount", { count: item.recipe.steps.length })}</span>
+              <span class="recipe-count-badge">${item.recipe.ingredients.length} ${te("ingredientsShort", "ingredients")}</span>
+              <span class="recipe-count-badge">${item.recipe.spices.length} ${te("spicesShort", "spices")}</span>
             </div>
             <div class="recipe-card-footer">
               ${renderRecipeRating(item)}
@@ -5210,6 +5738,31 @@
           </div>
           <div class="results-empty">
             <p>${te("noResultsHint", "You can search by dish name, ingredient, state special, or use Veg, Non-Veg, Drinks, and Cold Drinks filters.")}</p>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderThanksCard() {
+      return `
+        <article class="recipe-main-card thanks-card reveal-ready">
+          <div class="recipe-main-head">
+            <div class="recipe-main-copy">
+              <h2>${te("thanksCardTitle", "Thanks for visiting SpiceRoute")}</h2>
+              <p>${te("thanksCardText", "We hope these recipes help you cook something delicious today. Visit again for more tasty ideas and happy kitchen moments.")}</p>
+            </div>
+            <div class="card-summary-meta">
+              <span class="card-total">${te("visitAgain", "Visit Again")}</span>
+            </div>
+          </div>
+          <div class="results-empty">
+            <p>${te("thanksCardHint", "Save your favorites, try a new dish, and come back whenever you want another delicious recipe guide.")}</p>
+            <div class="thanks-emoji-row" aria-hidden="true">
+              <span>🍲</span>
+              <span>🍛</span>
+              <span>✨</span>
+              <span>😊</span>
+            </div>
           </div>
         </article>
       `;
@@ -5410,7 +5963,9 @@
           return renderMealGroupCard(mealKey, groupedResults.groupedByMeal[mealKey], topMatchIds, recipeCardOrder.length + mealIndex, searchText);
         }).filter(Boolean).join("");
 
-        container.innerHTML = (cardsMarkup + mealCardsMarkup) || renderEmptyRecipeState();
+        container.innerHTML = (cardsMarkup + mealCardsMarkup)
+          ? `${cardsMarkup}${mealCardsMarkup}${renderThanksCard()}`
+          : renderEmptyRecipeState();
       }
 
       document.getElementById("stats").textContent = t("statsShown", { visible: matchedRecipes.length, total: recipes.length });
