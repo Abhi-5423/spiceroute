@@ -4376,6 +4376,10 @@
       return `/assets/recipes/${recipeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.jpg`;
     }
 
+    function hasRealRecipeImage(recipeName) {
+      return recipePhotoNames.has(recipeName) || extraRecipePhotoNames.has(recipeName);
+    }
+
     function getRecipeImageAccent(recipe) {
       if (recipe.category === "drink") {
         return ["#0d9488", "#155e75", recipe.emoji || "🥤"];
@@ -4590,11 +4594,25 @@
     }
 
 function getRecipeImage(recipe) {
+      if (hasRealRecipeImage(recipe.name)) {
+        return getRecipeImagePath(recipe.name);
+      }
+
+      const fallbackImage = getFallbackRecipeImage(recipe);
+
+      if (fallbackImage) {
+        return fallbackImage;
+      }
+
       const [accentA, accentB, emoji] = getRecipeImageAccent(recipe);
       return createFoodCardImage(recipe.name, accentA, accentB, emoji);
     }
 
     function getGroupCardImage(groupKey, title = "") {
+      if (groupPhotoPaths[groupKey]) {
+        return groupPhotoPaths[groupKey];
+      }
+
       const themes = {
         veg: ["#4f8f52", "#2f6f46", "🥗"],
         nonveg: ["#c75b2c", "#8f3411", "🍗"],
