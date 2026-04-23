@@ -3531,6 +3531,53 @@
 
     addMissingRecipes();
     ensureDetailedRecipes();
+    normalizeRecipeCatalog();
+
+    function getRecipeQualityScore(recipe) {
+      return [
+        recipe.protein,
+        recipe.category,
+        recipe.emoji,
+        recipe.image
+      ].filter(Boolean).length
+        + (recipe.summary ? 2 : 0)
+        + (recipe.ingredients?.length || 0)
+        + (recipe.spices?.length || 0)
+        + (recipe.steps?.length || 0);
+    }
+
+    function buildLocalRecipeImagePath(recipe) {
+      return getRecipeImagePath(recipe.name);
+    }
+
+    function normalizeRecipeCatalog() {
+      const dedupedRecipes = [];
+      const recipeIndexByName = new Map();
+
+      recipes.forEach(recipe => {
+        const normalizedRecipe = {
+          ...recipe,
+          image: recipe.image && !isDeprecatedRemoteImage(recipe.image)
+            ? recipe.image
+            : buildLocalRecipeImagePath(recipe)
+        };
+        const lookupKey = normalizedRecipe.name.toLowerCase();
+        const existingIndex = recipeIndexByName.get(lookupKey);
+
+        if (existingIndex === undefined) {
+          recipeIndexByName.set(lookupKey, dedupedRecipes.length);
+          dedupedRecipes.push(normalizedRecipe);
+          return;
+        }
+
+        if (getRecipeQualityScore(normalizedRecipe) > getRecipeQualityScore(dedupedRecipes[existingIndex])) {
+          dedupedRecipes[existingIndex] = normalizedRecipe;
+        }
+      });
+
+      recipes.length = 0;
+      recipes.push(...dedupedRecipes);
+    }
 
     const indianStateCollections = [
       {
@@ -4589,9 +4636,12 @@
       ]);
     }
 
-function getRecipeImage(recipe) {
-      const [accentA, accentB, emoji] = getRecipeImageAccent(recipe);
-      return createFoodCardImage(recipe.name, accentA, accentB, emoji);
+    function getRecipeImage(recipe) {
+      if (recipe.image && !isDeprecatedRemoteImage(recipe.image)) {
+        return recipe.image;
+      }
+
+      return buildLocalRecipeImagePath(recipe);
     }
 
     function getGroupCardImage(groupKey, title = "") {
@@ -4606,7 +4656,19 @@ function getRecipeImage(recipe) {
       };
       const [accentA, accentB, emoji] = themes[groupKey] || ["#c75b2c", "#8f3411", "🍽️"];
 
-      return createFoodCardImage(title || "SpiceRoute", accentA, accentB, emoji);
+      return groupPhotoPaths[groupKey] || createFoodCardImage(title || "SpiceRoute", accentA, accentB, emoji);
+    }
+
+    function handleRecipeImageError(image) {
+      const fallbackSrc = image.dataset.fallbackSrc;
+
+      if (!image.dataset.fallbackApplied && fallbackSrc && image.currentSrc !== fallbackSrc) {
+        image.dataset.fallbackApplied = "true";
+        image.src = fallbackSrc;
+        return;
+      }
+
+      showImageFallback(image);
     }
 
     function getTypeLabel(recipe) {
@@ -5654,10 +5716,11 @@ function getRecipeImage(recipe) {
           <div class="img-box">
             <img
               src="${getRecipeImage(item.recipe)}"
+              data-fallback-src="${getFallbackRecipeImage(item.recipe)}"
               alt="${escapeHtml(getRecipeTitle(item.recipe))}"
               title="${escapeHtml(getRecipeTitle(item.recipe))}"
               loading="lazy"
-              onerror="showImageFallback(this)"
+              onerror="handleRecipeImageError(this)"
             >
             <div class="overlay">
               <span>${getRecipeTitle(item.recipe)}</span>
@@ -6112,7 +6175,7 @@ function getRecipeImage(recipe) {
       detailPage.innerHTML = `
         <button class="back-btn" onclick="closeRecipePage()">${t("back")}</button>
         <section class="detail-hero">
-          <img src="${getRecipeImage(recipe)}" alt="${getRecipeTitle(recipe)}" title="${getRecipeTitle(recipe)}" onerror="showImageFallback(this)">
+          <img src="${getRecipeImage(recipe)}" data-fallback-src="${getFallbackRecipeImage(recipe)}" alt="${getRecipeTitle(recipe)}" title="${getRecipeTitle(recipe)}" onerror="handleRecipeImageError(this)">
           <div class="detail-intro">
             <h2>${getRecipeTitle(recipe)}</h2>
             <p class="summary">${recipe.summary}</p>
