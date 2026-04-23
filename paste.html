@@ -4637,11 +4637,8 @@
     }
 
     function getRecipeImage(recipe) {
-      if (recipe.image && !isDeprecatedRemoteImage(recipe.image)) {
-        return recipe.image;
-      }
-
-      return buildLocalRecipeImagePath(recipe);
+      const [accentA, accentB, emoji] = getRecipeImageAccent(recipe);
+      return createFoodCardImage(recipe.name, accentA, accentB, emoji);
     }
 
     function getGroupCardImage(groupKey, title = "") {
@@ -4657,18 +4654,6 @@
       const [accentA, accentB, emoji] = themes[groupKey] || ["#c75b2c", "#8f3411", "🍽️"];
 
       return groupPhotoPaths[groupKey] || createFoodCardImage(title || "SpiceRoute", accentA, accentB, emoji);
-    }
-
-    function handleRecipeImageError(image) {
-      const fallbackSrc = image.dataset.fallbackSrc;
-
-      if (!image.dataset.fallbackApplied && fallbackSrc && image.currentSrc !== fallbackSrc) {
-        image.dataset.fallbackApplied = "true";
-        image.src = fallbackSrc;
-        return;
-      }
-
-      showImageFallback(image);
     }
 
     function getTypeLabel(recipe) {
@@ -5716,11 +5701,10 @@
           <div class="img-box">
             <img
               src="${getRecipeImage(item.recipe)}"
-              data-fallback-src="${getFallbackRecipeImage(item.recipe)}"
               alt="${escapeHtml(getRecipeTitle(item.recipe))}"
               title="${escapeHtml(getRecipeTitle(item.recipe))}"
               loading="lazy"
-              onerror="handleRecipeImageError(this)"
+              onerror="showImageFallback(this)"
             >
             <div class="overlay">
               <span>${getRecipeTitle(item.recipe)}</span>
@@ -6175,7 +6159,7 @@
       detailPage.innerHTML = `
         <button class="back-btn" onclick="closeRecipePage()">${t("back")}</button>
         <section class="detail-hero">
-          <img src="${getRecipeImage(recipe)}" data-fallback-src="${getFallbackRecipeImage(recipe)}" alt="${getRecipeTitle(recipe)}" title="${getRecipeTitle(recipe)}" onerror="handleRecipeImageError(this)">
+          <img src="${getRecipeImage(recipe)}" alt="${getRecipeTitle(recipe)}" title="${getRecipeTitle(recipe)}" onerror="showImageFallback(this)">
           <div class="detail-intro">
             <h2>${getRecipeTitle(recipe)}</h2>
             <p class="summary">${recipe.summary}</p>
